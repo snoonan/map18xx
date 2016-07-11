@@ -192,35 +192,7 @@
         <use xlink:href="#sharp"/>
         <use xlink:href="#sharp" transform="rotate(180)"/>
   </g>
-  <!-- dits -->
-  <g id="t141">
-        <use xlink:href="#hex" fill="green"/>
-        <use xlink:href="#center"/>
-        <use xlink:href="#center" transform="rotate(60)"/>
-        <use xlink:href="#center" transform="rotate(180)"/>
-        <use xlink:href="#ditc"/>
-  </g>
-  <g id="t142">
-        <use xlink:href="#hex" fill="green"/>
-        <use xlink:href="#center"/>
-        <use xlink:href="#center" transform="rotate(60)"/>
-        <use xlink:href="#center" transform="rotate(180)"/>
-        <use xlink:href="#ditc"/>
-  </g>
-  <g id="t143">
-        <use xlink:href="#hex" fill="green"/>
-        <use xlink:href="#center"/>
-        <use xlink:href="#center" transform="rotate(60)"/>
-        <use xlink:href="#center" transform="rotate(120)"/>
-        <use xlink:href="#ditc"/>
-  </g>
-  <g id="t203">
-        <use xlink:href="#hex" fill="green"/>
-        <use xlink:href="#center"/>
-        <use xlink:href="#center" transform="rotate(120)"/>
-        <use xlink:href="#center" transform="rotate(-120)"/>
-        <use xlink:href="#ditc"/>
-  </g>
+
   <!-- big cities -->
   <g id="t179">
         <use xlink:href="#hex" fill="green"/>
@@ -374,6 +346,36 @@
         <use xlink:href="#citys" transform="rotate(30)"/>
   </g>
 
+<!-- brown -->
+  <!-- dits -->
+  <g id="t141">
+        <use xlink:href="#hex" fill="brown"/>
+        <use xlink:href="#center"/>
+        <use xlink:href="#center" transform="rotate(60)"/>
+        <use xlink:href="#center" transform="rotate(-120)"/>
+        <use xlink:href="#ditc"/>
+  </g>
+  <g id="t142">
+        <use xlink:href="#hex" fill="brown"/>
+        <use xlink:href="#center"/>
+        <use xlink:href="#center" transform="rotate(60)"/>
+        <use xlink:href="#center" transform="rotate(180)"/>
+        <use xlink:href="#ditc"/>
+  </g>
+  <g id="t143">
+        <use xlink:href="#hex" fill="brown"/>
+        <use xlink:href="#center"/>
+        <use xlink:href="#center" transform="rotate(60)"/>
+        <use xlink:href="#center" transform="rotate(120)"/>
+        <use xlink:href="#ditc"/>
+  </g>
+  <g id="t203">
+        <use xlink:href="#hex" fill="brown"/>
+        <use xlink:href="#center"/>
+        <use xlink:href="#center" transform="rotate(120)"/>
+        <use xlink:href="#center" transform="rotate(-120)"/>
+        <use xlink:href="#ditc"/>
+  </g>
 
   <!-- ground -->
   <g id="t500">
