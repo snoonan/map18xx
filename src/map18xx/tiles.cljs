@@ -1,6 +1,7 @@
 (ns map18xx.tiles
   (:require [om.next :as om :refer-macros [defui]]
             [om.dom :as dom]
+            [cljsjs.react]
             [map18xx.upgrade :as upgrade]
             [map18xx.map1820 :as board]
             [map18xx.utils :as utils]
@@ -8,6 +9,8 @@
 
 (def draw-state (atom {}))
 
+; Because react.dom does not have an entry for 'use' so create one here.
+(def dom-use (js/React.createFactory "use"))
 
 (defn intersect-track
   [tile e1 e2 upgrademaps]
@@ -96,7 +99,7 @@
                    :onClick
                       (fn [e] (cycle-plain tile pos this))
                   }
-        (dom/use #js {:xlinkHref (str "defs.svg#" tile)
+        (dom-use #js {:xlinkHref (str "defs.svg#" tile)
                   :transform (str "scale("scale") rotate(" (* orient 60) ")")}
                   (str orient ", points: " pos))))))
 
