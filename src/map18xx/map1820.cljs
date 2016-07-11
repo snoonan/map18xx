@@ -2,7 +2,7 @@
 
 (def app-state {
     :rotate 30
-    :scale 20
+    :scale 50
     :tiles [
             { :pos "a7"  :tile "g7"   :orient 2 }
             { :pos "a9"  :tile "g7"   :orient 2 }
@@ -17,7 +17,7 @@
             { :pos "b14" :tile "t500" :orient 0 }
             { :pos "b16" :tile "t500" :orient 0 }
             { :pos "c3"  :tile "t506" :orient 1 }
-            { :pos "c5"  :tile "t503" :orient 0 }
+            { :pos "c5"  :tile "tbig" :orient 0 }
             { :pos "c7"  :tile "t504" :orient 0 }
             { :pos "c9"  :tile "t500" :orient 0 }
             { :pos "c11" :tile "t504" :orient 0 }
@@ -26,7 +26,7 @@
             { :pos "c17" :tile "t505" :orient 4 }
             { :pos "d2"  :tile "t506" :orient 1 }
             { :pos "d4"  :tile "t504" :orient 0 }
-            { :pos "d6"  :tile "tman" :orient 0 }
+            { :pos "d6"  :tile "t519" :orient 0 }
             { :pos "d8"  :tile "t500" :orient 0 }
             { :pos "d10" :tile "t504" :orient 0 }
             { :pos "d12" :tile "t500" :orient 0 }
@@ -53,7 +53,7 @@
             { :pos "g1"  :tile "g624" :orient 1 }
             { :pos "g3"  :tile "t500" :orient 0 }
             { :pos "g5"  :tile "t500" :orient 0 }
-            { :pos "g7"  :tile "t503" :orient 0 }
+            { :pos "g7"  :tile "tbig" :orient 0 }
             { :pos "g9"  :tile "t500" :orient 0 }
             { :pos "g11" :tile "t500" :orient 0 }
             { :pos "g13" :tile "t500" :orient 0 }
@@ -66,7 +66,7 @@
             { :pos "h8"  :tile "t500" :orient 0 }
             { :pos "h10" :tile "t500" :orient 0 }
             { :pos "h12" :tile "t500" :orient 0 }
-            { :pos "h14" :tile "t503" :orient 0 }
+            { :pos "h14" :tile "tbig" :orient 0 }
             { :pos "h16" :tile "t500" :orient 0 }
             { :pos "h18" :tile "t500" :orient 0 }
             { :pos "h20" :tile "t500" :orient 0 }
@@ -121,7 +121,7 @@
             { :pos "m7"  :tile "t500" :orient 0 }
             { :pos "m9"  :tile "t500" :orient 0 }
             { :pos "m11" :tile "t500" :orient 0 }
-            { :pos "m13" :tile "glon" :orient 0 }
+            { :pos "m13" :tile "g809" :orient 0 }
             { :pos "m15" :tile "gchat" :orient 0 }
             { :pos "m17" :tile "ghoriz" :orient 0 }
             { :pos "m19" :tile "t505" :orient 4 }
