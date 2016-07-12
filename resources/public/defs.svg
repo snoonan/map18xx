@@ -64,19 +64,19 @@
         <use xlink:href="#hex" fill="yellow"/>
         <use xlink:href="#sharp"/>
         <use xlink:href="#citys"/>
-        <text x=".5" y="0" font-size=".2">B</text>
+        <text x="25" y="0" font-size="12" transform="scale(.02)">B</text>
   </g>
   <g id="t149">
         <use xlink:href="#hex" fill="yellow"/>
         <use xlink:href="#gentle"/>
         <use xlink:href="#cityg"/>
-        <text x=".5" y="0" font-size=".2">B</text>
+        <text x="25" y="0" font-size="12" transform="scale(.02)">B</text>
   </g>
   <g id="t150">
         <use xlink:href="#hex" fill="yellow"/>
         <use xlink:href="#straight"/>
         <use xlink:href="#cityc"/>
-        <text x=".5" y="0" font-size=".2">B</text>
+        <text x="25" y="0" font-size="12" transform="scale(.02)">B</text>
   </g>
   <g id="t803">
         <use xlink:href="#hex" fill="yellow"/>
@@ -95,6 +95,15 @@
         <use xlink:href="#straight"/>
         <use xlink:href="#citys" transform="rotate(-30)"/>
         <use xlink:href="#citys" transform="rotate(90)"/>
+  </g>
+  <g id="t394"> <!-- manchester -->
+        <use xlink:href="#hex" fill="yellow"/>
+        <use xlink:href="#straight"/>
+        <use xlink:href="#straight" transform="rotate(60)"/>
+        <use xlink:href="#straight" transform="rotate(120)"/>
+        <use xlink:href="#citys" transform="rotate(150)"/>
+        <use xlink:href="#citys" transform="rotate(-90)"/>
+        <use xlink:href="#citys" transform="rotate(30)"/>
   </g>
   <!-- green -->
   <g id="t16">
@@ -200,7 +209,7 @@
         <use xlink:href="#center" transform="rotate(60)"/>
         <use xlink:href="#center" transform="rotate(120)"/>
         <use xlink:href="#cityc"/>
-        <text x=".5" y="0" font-size=".2">B</text>
+        <text x="25" y="0" font-size="12" transform="scale(.02)">B</text>
   </g>
   <g id="t180">
         <use xlink:href="#hex" fill="green"/>
@@ -208,7 +217,7 @@
         <use xlink:href="#center" transform="rotate(60)"/>
         <use xlink:href="#center" transform="rotate(180)"/>
         <use xlink:href="#cityc"/>
-        <text x=".5" y="0" font-size=".2">B</text>
+        <text x="25" y="0" font-size="12" transform="scale(.02)">B</text>
   </g>
   <g id="t181">
         <use xlink:href="#hex" fill="green"/>
@@ -216,7 +225,7 @@
         <use xlink:href="#center" transform="rotate(60)"/>
         <use xlink:href="#center" transform="rotate(-120)"/>
         <use xlink:href="#cityc"/>
-        <text x=".5" y="0" font-size=".2">B</text>
+        <text x="25" y="0" font-size="12" transform="scale(.02)">B</text>
   </g>
   <g id="t182">
         <use xlink:href="#hex" fill="green"/>
@@ -224,7 +233,7 @@
         <use xlink:href="#center" transform="rotate(120)"/>
         <use xlink:href="#center" transform="rotate(-120)"/>
         <use xlink:href="#cityc"/>
-        <text x=".5" y="0" font-size=".2">B</text>
+        <text x="25" y="0" font-size="12" transform="scale(.02)">B</text>
   </g>
   <!-- cities -->
   <g id="t14">
@@ -245,7 +254,7 @@
         <use xlink:href="#cityg"/>
         <use xlink:href="#cityg" transform="rotate(180)"/>
   </g>
-  <g id="t52">
+  <g id="t38">
         <use xlink:href="#hex" fill="green"/>
         <use xlink:href="#center"/>
         <use xlink:href="#center" transform="rotate(180)"/>
@@ -324,15 +333,6 @@
         <use xlink:href="#citys" transform="rotate(-90)"/>
         <use xlink:href="#citys" transform="rotate(30)"/>
   </g>
-  <g id="t394">
-        <use xlink:href="#hex" fill="green"/>
-        <use xlink:href="#straight"/>
-        <use xlink:href="#straight" transform="rotate(60)"/>
-        <use xlink:href="#straight" transform="rotate(120)"/>
-        <use xlink:href="#citys" transform="rotate(150)"/>
-        <use xlink:href="#citys" transform="rotate(-90)"/>
-        <use xlink:href="#citys" transform="rotate(30)"/>
-  </g>
   <g id="t815">
         <use xlink:href="#hex" fill="green"/>
         <use xlink:href="#straight"/>
@@ -347,6 +347,102 @@
   </g>
 
 <!-- brown -->
+  <g id="t39">
+        <use xlink:href="#hex" fill="brown"/>
+        <use xlink:href="#gentle"/>
+        <use xlink:href="#sharp"/>
+        <use xlink:href="#sharp" transform="rotate(60)"/>
+  </g>
+  <g id="t40">
+        <use xlink:href="#hex" fill="brown"/>
+        <use xlink:href="#gentle"/>
+        <use xlink:href="#gentle" transform="rotate(120)"/>
+        <use xlink:href="#gentle" transform="rotate(-120)"/>
+  </g>
+  <g id="t41">
+        <use xlink:href="#hex" fill="brown"/>
+        <use xlink:href="#straight"/>
+        <use xlink:href="#gentle" transform="rotate(-120)"/>
+        <use xlink:href="#sharp" transform="rotate(180)"/>
+  </g>
+  <g id="t42">
+        <use xlink:href="#hex" fill="brown"/>
+        <use xlink:href="#straight"/>
+        <use xlink:href="#gentle"/>
+        <use xlink:href="#sharp" transform="rotate(120)"/>
+  </g>
+  <g id="t43">
+        <use xlink:href="#hex" fill="brown"/>
+        <use xlink:href="#straight"/>
+        <use xlink:href="#gentle"/>
+        <use xlink:href="#gentle" transform="rotate(60)"/>
+        <use xlink:href="#sharp" transform="rotate(60)"/>
+  </g>
+  <g id="t44">
+        <use xlink:href="#hex" fill="brown"/>
+        <use xlink:href="#straight"/>
+        <use xlink:href="#sharp"/>
+        <use xlink:href="#straight" transform="rotate(60)"/>
+        <use xlink:href="#sharp" transform="rotate(180)"/>
+  </g>
+  <g id="t45">
+        <use xlink:href="#hex" fill="brown"/>
+        <use xlink:href="#straight"/>
+        <use xlink:href="#gentle" transform="rotate(-60)"/>
+        <use xlink:href="#gentle" transform="rotate(60)"/>
+        <use xlink:href="#sharp" transform="rotate(-60)"/>
+  </g>
+  <g id="t46">
+        <use xlink:href="#hex" fill="brown"/>
+        <use xlink:href="#straight"/>
+        <use xlink:href="#gentle" transform="rotate(-60)"/>
+        <use xlink:href="#gentle" transform="rotate(180)"/>
+        <use xlink:href="#sharp"/>
+  </g>
+  <g id="t47">
+        <use xlink:href="#hex" fill="brown"/>
+        <use xlink:href="#straight"/>
+        <use xlink:href="#straight" transform="rotate(60)"/>
+        <use xlink:href="#gentle" transform="rotate(60)"/>
+        <use xlink:href="#gentle" transform="rotate(-120)"/>
+  </g>
+  <g id="t70">
+        <use xlink:href="#hex" fill="brown"/>
+        <use xlink:href="#gentle"/>
+        <use xlink:href="#gentle" transform="rotate(60)"/>
+        <use xlink:href="#sharp"/>
+        <use xlink:href="#sharp" transform="rotate(120)"/>
+  </g>
+  <g id="t627">
+        <use xlink:href="#hex" fill="brown"/>
+        <use xlink:href="#straight"/>
+        <use xlink:href="#sharp"/>
+        <use xlink:href="#sharp" transform="rotate(60)"/>
+        <use xlink:href="#sharp" transform="rotate(120)"/>
+  </g>
+  <g id="t628">
+        <use xlink:href="#hex" fill="brown"/>
+        <use xlink:href="#gentle"/>
+        <use xlink:href="#sharp" transform="rotate(120)"/>
+        <use xlink:href="#gentle" transform="rotate(180)"/>
+        <use xlink:href="#sharp" transform="rotate(-60)"/>
+  </g>
+  <g id="t629">
+        <use xlink:href="#hex" fill="brown"/>
+        <use xlink:href="#gentle"/>
+        <use xlink:href="#sharp" transform="rotate(120)"/>
+        <use xlink:href="#sharp" transform="rotate(180)"/>
+        <use xlink:href="#gentle" transform="rotate(-120)"/>
+  </g>
+  <!-- city -->
+  <g id="t51">
+        <use xlink:href="#hex" fill="green"/>
+        <use xlink:href="#center"/>
+        <use xlink:href="#center" transform="rotate(60)"/>
+        <use xlink:href="#center" transform="rotate(120)"/>
+        <use xlink:href="#center" transform="rotate(-60)"/>
+        <use xlink:href="#cityc"/>
+  </g>
   <!-- dits -->
   <g id="t141">
         <use xlink:href="#hex" fill="brown"/>
@@ -376,7 +472,35 @@
         <use xlink:href="#center" transform="rotate(-120)"/>
         <use xlink:href="#ditc"/>
   </g>
-
+ <!-- big cities -->
+  <g id="t198">
+        <use xlink:href="#hex" fill="brown"/>
+        <use xlink:href="#center"/>
+        <use xlink:href="#center" transform="rotate(180)"/>
+        <use xlink:href="#center" transform="rotate(60)"/>
+        <use xlink:href="#center" transform="rotate(-120)"/>
+        <use xlink:href="#cityg"/>
+        <use xlink:href="#cityg" transform="rotate(180)"/>
+  </g>
+  <g id="t199">
+        <use xlink:href="#hex" fill="brown"/>
+        <use xlink:href="#center"/>
+        <use xlink:href="#center" transform="rotate(180)"/>
+        <use xlink:href="#center" transform="rotate(60)"/>
+        <use xlink:href="#center" transform="rotate(120)"/>
+        <use xlink:href="#cityg"/>
+        <use xlink:href="#cityg" transform="rotate(180)"/>
+  </g>
+  <g id="t200">
+        <use xlink:href="#hex" fill="brown"/>
+        <use xlink:href="#center"/>
+        <use xlink:href="#center" transform="rotate(180)"/>
+        <use xlink:href="#center" transform="rotate(-60)"/>
+        <use xlink:href="#center" transform="rotate(60)"/>
+        <use xlink:href="#cityg"/>
+        <use xlink:href="#cityg" transform="rotate(180)"/>
+  </g>
+ 
   <!-- ground -->
   <g id="t500">
         <use xlink:href="#hex" fill="white"/>
@@ -388,7 +512,7 @@
   <g id="tbig">
         <use xlink:href="#hex" fill="white"/>
         <use xlink:href="#cityc"/>
-        <text x=".5" y="0" font-size=".2">B</text>
+        <text x="25" y="0" font-size="12" transform="scale(.02)">B</text>
   </g>
   <g id="t503">
         <use xlink:href="#hex" fill="white"/>
@@ -419,7 +543,7 @@
         <use xlink:href="#hex" fill="grey"/>
         <use xlink:href="#sharp"/>
   </g>
-  <g id="glon">
+  <g id="g809">
         <use xlink:href="#hex" fill="grey"/>
         <use xlink:href="#straight" transform="rotate(60)"/>
         <use xlink:href="#gentle" transform="rotate(60)"/>

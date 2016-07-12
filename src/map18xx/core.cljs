@@ -9,7 +9,6 @@
             [map18xx.utils :as utils]
             ))
 
-(enable-console-print!)
 
 (defui MapView
        static om/IQuery
@@ -17,9 +16,19 @@
               [{:tiles (om/get-query tiles/TileView)}])
        Object
        (render [this]
-               (let [tiles (-> this om/props :tiles)]
-                 (dom/svg #js {:width 5000 :height 5000}
-                   (mapv tiles/tile-view tiles)))))
+               (let [scale 10
+                     tiles (-> this om/props :tiles)
+                     rotate  (:rotate board/app-state)
+                     width (if (= rotate 30) 0.86 1.5)
+                     height (if (= rotate 30) 1.5 0.86)
+                     [mx my] (reduce #(
+                               let [[y x] (utils/pos-to-rc (:pos %2))
+                                    [maxx maxy] %1]
+                                   [(max x maxx) (max y maxy)]
+                                    ) [0 0] tiles)]
+                 (dom/svg #js {:width (* (+ mx 8) width scale) :height (* (+ my 8) height scale)}
+                  (dom/g #js {:transform (str "scale("scale")")}
+                   (mapv tiles/tile-view tiles))))))
 
 (def reconciler
   (om/reconciler
