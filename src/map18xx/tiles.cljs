@@ -42,7 +42,11 @@
   [[this pos-entry] e1 e2]
   (do (println "insert for" (:pos pos-entry))
   (if (not (= e1 (mod (+ 3 e2) 6)))
-      (om/transact! this `[(hex/lay-tile ~(upgrade-to pos-entry [e1 e2]))]))))
+      (if-let [upgrade (upgrade-to pos-entry [e1 e2])]
+        (do
+          (om/transact! this `[(hex/lay-tile ~upgrade)])
+          true)
+      false))))
 
 (defn hex-down
   [pos-entry pos this]
@@ -65,8 +69,9 @@
                newdraw {:in [((:in @draw-state) 1) pos] :from direction :last [this pos-entry] :drawing true}
                ]
            (do
-             (insert-tile (:last @draw-state) (:from @draw-state) (:from newdraw))
-             (insert-tile (:last @draw-state) nil (:from newdraw))      ; just the exit leg matters. Do this AFTER testing for both legs.
+             (or
+               (insert-tile (:last @draw-state) (:from @draw-state) (:from newdraw))
+               (insert-tile (:last @draw-state) nil (:from newdraw)))   ; just the exit leg matters. Do this AFTER testing for both legs.
              (insert-tile (:last newdraw) nil (+ 3 (:from newdraw)))    ; No need to wrap as it will be wrapped later.
              (swap! draw-state (fn [] newdraw))))
       (swap! draw-state assoc-in [:last] [this pos-entry]))))
