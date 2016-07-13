@@ -1,4 +1,4 @@
-(defproject map18xx "0.1.0-SNAPSHOT"
+(defproject map18xx "0.1.0"
   :description "18xx interactive map"
   :url "http://tbearsiberians.com/18xx"
   :license {:name "Eclipse Public License"
