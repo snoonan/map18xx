@@ -1,0 +1,6 @@
+{
+  "name": "Map18xx",
+  "tagline": "ClojureScript/om.next based 18xx map with track editor",
+  "body": "### Populate 18xx maps with track\r\nJust click and drag to lay track, upgrades happen automagically.\r\nIf you mess up, click undo as needed to restore order.\r\n\r\n## Todo:\r\n- Have different base maps\r\n- Get offboards and city names/values implemented'\r\n- Add stations\r\n- More tiles\r\n- Descriptive tile format for auto-placing stations during upgrades.\r\n\r\n",
+  "note": "Don't delete this file! It's used internally to help with page regeneration."
+}
