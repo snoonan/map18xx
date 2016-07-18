@@ -18,7 +18,7 @@
   (let [
         [tiles upgrades] (first upgrademaps)
          tile-edges (tiles tile)
-         _ (println tile (into tile-edges edges))]
+         ]
     (if-not (nil? tile-edges)
       (upgrades (into tile-edges edges))
       (recur tile edges (next upgrademaps))))))
@@ -40,29 +40,25 @@
 (defn insert-tile
   "Add a path to a tile."
   [[this pos-entry] e1 e2]
-  (do (println "insert for" (:pos pos-entry))
   (if (not (= e1 (mod (+ 3 e2) 6)))
       (if-let [upgrade (upgrade-to pos-entry [e1 e2])]
         (do
           (om/transact! this `[(hex/lay-tile ~upgrade)])
           true)
-      false))))
+      false)))
 
 (defn hex-down
   [pos-entry pos this]
-  (do (println "down" pos)
   (swap! draw-state (fn []
-                        {:in [nil pos]  :last [this pos-entry] :drawing true}))))
+                        {:in [nil pos]  :last [this pos-entry] :drawing true})))
 
 (defn hex-up
   []
-  (do (println "up")
-  (swap! draw-state assoc-in [:drawing] false)))
+  (swap! draw-state assoc-in [:drawing] false))
 
 
 (defn hex-enter
   [pos-entry pos this]
-  (do (println "enter" (:drawing @draw-state) pos)
     (if (:drawing @draw-state)
       (let [lastpos ((:in @draw-state) 1)
                direction (utils/find-direction lastpos pos (:rotate board/app-state))
@@ -74,7 +70,7 @@
                (insert-tile (:last @draw-state) nil (:from newdraw)))   ; just the exit leg matters. Do this AFTER testing for both legs.
              (insert-tile (:last newdraw) nil (+ 3 (:from newdraw)))    ; No need to wrap as it will be wrapped later.
              (swap! draw-state (fn [] newdraw))))
-      (swap! draw-state assoc-in [:last] [this pos-entry]))))
+      (swap! draw-state assoc-in [:last] [this pos-entry])))
 
 (defn cycle-plain
   [org-tile pos this]
@@ -84,7 +80,7 @@
                 "tbig"  "t503"
                 "t503"  "t501"
                 "t501"  "t500"
-                :default nil
+                nil
                 )
         ]
      (om/transact! this `[(hex/lay-tile ~{:pos pos :tile tile :orient 0})])))

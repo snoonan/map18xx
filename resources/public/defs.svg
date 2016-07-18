@@ -472,6 +472,15 @@
         <use xlink:href="#center" transform="rotate(-120)"/>
         <use xlink:href="#ditc"/>
   </g>
+  <g id="t339">
+        <use xlink:href="#hex" fill="brown"/>
+        <use xlink:href="#gentle" transform="rotate(180)"/>
+        <use xlink:href="#sharp"  transform="rotate(-60)"/>
+        <use xlink:href="#gentle" transform="rotate(120)"/>
+        <use xlink:href="#sharp"  transform="rotate(60)"/>
+        <use xlink:href="#citys" transform="rotate(90)"/>
+        <use xlink:href="#citys" transform="rotate(-90)"/>
+  </g>
  <!-- big cities -->
   <g id="t198">
         <use xlink:href="#hex" fill="brown"/>
@@ -499,6 +508,20 @@
         <use xlink:href="#center" transform="rotate(60)"/>
         <use xlink:href="#cityg"/>
         <use xlink:href="#cityg" transform="rotate(180)"/>
+  </g>
+  <!-- manchester -->
+  <g id="t375">
+        <use xlink:href="#hex" fill="brown"/>
+        <use xlink:href="#center"/>
+        <use xlink:href="#center" transform="rotate(60)"/>
+        <use xlink:href="#center" transform="rotate(120)"/>
+        <use xlink:href="#center" transform="rotate(180)"/>
+        <use xlink:href="#center" transform="rotate(-60)"/>
+        <use xlink:href="#center" transform="rotate(-120)"/>
+        <use xlink:href="#cityg"/>
+        <use xlink:href="#cityg" transform="rotate(180)"/>
+        <use xlink:href="#cityg" transform="rotate(90)"/>
+        <use xlink:href="#cityg" transform="rotate(-90)"/>
   </g>
  
   <!-- ground -->

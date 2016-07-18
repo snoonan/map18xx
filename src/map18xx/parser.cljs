@@ -6,6 +6,13 @@
 
 (defmulti read om/dispatch)
 
+(defmethod read :default
+    [{:keys [state] :as env} key params]
+      (let [st @state]
+            (if-let [[_ value] (find st key)]
+                    {:value value}
+                          {:value :not-found})))
+
 (defmethod read :tiles
     [{:keys [state] :as env} key params]
       { :value (into [] (map #(get-in @state %) (get @state key))) })
