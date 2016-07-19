@@ -27,13 +27,13 @@
       (if (= 0 (count i))
         nil
         (if (= 0 (last i))
-          (recur (pop i)) (- i 1))))
+          (recur (pop i)) (update i (dec (count i)) dec))))
     (update current-path (-(count current-path) 1) dec)))
 
 (defn next-history
   "Address of next item in history or nil if last"
   [{ :keys [current-path moments]}]
-  (let [next-path (update current-path (-(count current-path) 1) inc)
+  (let [next-path (update current-path (dec (count current-path)) inc)
         ]
     (loop [i next-path]
       (if (vector? (get-in moments i))
@@ -74,12 +74,12 @@
      (let [running' (reduce (partial ttg-helper indentf itemf)
                                   [(conj (running 0) 0) (running (-(count running) 1))] item)
            running'' (update running' 0 pop)
-           running''' (update-in running'' [0 (- (count (running 0)) 1)] inc)
+           running''' (update-in running'' [0 (dec (count (running 0)))] inc)
            ]
          (conj running''' (vec (map-indexed (partial indentf (running''' 0)) (running''' 0)))))
      (-> running
-         (update-in [0 (- (count (running 0)) 1)] inc)
-         (update-in [(- (count running) 1)] conj (itemf (running 0) (= (running 0) (:current-path @app-history)))))))
+         (update-in [0 (dec (count (running 0)))] inc)
+         (update-in [(dec (count running))] conj (itemf (running 0) (= (running 0) (:current-path @app-history)))))))
 
 (defn transform-to-grid
 "Transform the history into a horizantal grid display
