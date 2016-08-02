@@ -86,4 +86,3 @@
 use as: (transform-to-grid  #(do [:skip %]) #(do [:item %]) @app-history)"
    [indentf itemf {:keys [moments]}]
    (rest (reduce (partial ttg-helper indentf itemf) [[0] []] moments)))
-
