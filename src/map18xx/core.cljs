@@ -8,6 +8,7 @@
             [map18xx.tiles :as tiles]
             [map18xx.parser :as p]
             [map18xx.utils :as utils]
+            [map18xx.upg :as u]
             [map18xx.timetravel :as timetravel]
             ))
 
@@ -18,7 +19,7 @@
               [{:tiles (om/get-query tiles/TileView)}])
        Object
        (render [this]
-               (let [scale 50
+               (let [scale 30
                      tiles (-> this om/props :tiles)
                      rotate  (:rotate board/app-state)
                      width (if (= rotate 30) 0.86 1.5)
@@ -30,7 +31,8 @@
                                     ) [0 0] tiles)]
                  (dom/svg #js {:width (* (+ mx 8) width scale) :height (* (+ my 8) height scale)}
                   (dom/g #js {:transform (str "scale("scale")")}
-                   (mapv tiles/tile-view tiles))))))
+                   (mapv tiles/tile-view tiles))
+                  (dom/g #js {:id "upgrade-select" :transform (str "scale("scale")")})))))
 
 (def reconciler
   (om/reconciler
@@ -72,9 +74,11 @@
           (dom/table nil
            (dom/thead nil
              (dom/tr nil
-               (dom/th nil (dom/button #js {:onClick #(timetravel/undo (om/app-state reconciler))} "Undo"))
-               (dom/th nil (dom/button #js {:onClick #(timetravel/redo (om/app-state reconciler))} "Redo"))
-               ))
+               (let [path (:current-path (om/props this))  ]
+                 (if-not (and (= (count path) 1) (= (first path) 0))
+                   (dom/th nil (dom/button #js {:onClick #(timetravel/undo (om/app-state reconciler))} "Undo"))
+                   ))
+               (dom/th nil (dom/button #js {:onClick #(timetravel/redo (om/app-state reconciler))} "Redo"))))
            (dom/tbody nil
             (map #(dom/tr nil %) (timetravel/transform-to-grid
                                #(span-view {:span %3 :path (string/join "-" [%1 %2])})

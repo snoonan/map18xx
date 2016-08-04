@@ -14,9 +14,22 @@
   <use    id="cityg"    xlink:href="#cityc" transform="translate(0.2,-0.15)"/>
   <use    id="citys"    xlink:href="#cityc" transform="translate(0.2,-0.4)"/>
   <circle id="ditc"     r=".15" fill="black" stroke="black" stroke-width="0.02"/>
-  <use    id="ditg"    xlink:href="#ditc" transform="translate(0.2,-0.15)"/>
-  <use    id="dits"    xlink:href="#ditc" transform="translate(0.2,-0.4)"/>
-  <path   id="offboard" d="M -0.15 -.86 l 0.3 0 l -0.15 .46 z" fill="black" stroke-width="0.01"></path>
+  <use    id="ditg"     xlink:href="#ditc" transform="translate(0.2,-0.15)"/>
+  <use    id="dits"     xlink:href="#ditc" transform="translate(0.2,-0.4)"/>
+  <path   id="offboard" d="M -0.15 -.86 l 0.3 0 l -0.15 .26 z" fill="black" stroke-width="0.01"></path>
+  <path   id="water"    d="M -.75 0 Q -.5 -.25 -.25 0 Q 0 .25 .25 0 Q .5 -.25 .75 0" stroke="black" stroke-width="0.05" fill="none"/>
+  <path   id="mountain" d="M -.33 .33 L 0 -.33 L .33 .33 z" stroke="black" stroke-width="0.05" fill="none"/>
+  <path   id="tributary" d="M -1 0 l .5 .86" stroke="blue" stroke-width="0.18" fill="none"/>
+  <!-- terrain -->
+  <g id="tmountain">
+        <use xlink:href="#mountain"/>
+  </g>
+  <g id="twater">
+        <use xlink:href="#water"/>
+  </g>
+  <g id="ttributary">
+        <use xlink:href="#tributary"/>
+  </g>
   <!-- yellow -->
   <g id="t5">
         <use xlink:href="#hex" fill="yellow"/>
@@ -523,40 +536,74 @@
         <use xlink:href="#cityg" transform="rotate(90)"/>
         <use xlink:href="#cityg" transform="rotate(-90)"/>
   </g>
- 
+  <!-- grey -->
+  <g id="t290">
+        <use xlink:href="#hex" fill="lightgrey"/>
+        <use xlink:href="#center" transform="rotate(60)"/>
+        <use xlink:href="#center" transform="rotate(120)"/>
+        <use xlink:href="#center" transform="rotate(180)"/>
+        <use xlink:href="#center" transform="rotate(-120)"/>
+        <use xlink:href="#center" transform="rotate(-60)"/>
+        <use xlink:href="#cityg"/>
+        <use xlink:href="#cityg" transform="rotate(180)"/>
+  </g>
+  <g id="t804">
+        <use xlink:href="#hex" fill="lightgrey"/>
+        <use xlink:href="#gentle" transform="rotate(180)"/>
+        <use xlink:href="#sharp"  transform="rotate(-60)"/>
+        <use xlink:href="#gentle" transform="rotate(120)"/>
+        <use xlink:href="#sharp"  transform="rotate(60)"/>
+        <path   d="M -0.4 -0.2 L 0.4 0.2" ></path>
+        <use xlink:href="#citys" transform="rotate(90)"/>
+        <use xlink:href="#citys" transform="rotate(-90)"/>
+  </g>
+  <!-- manchester -->
+  <g id="tM04">
+        <use xlink:href="#hex" fill="lightgrey"/>
+        <use xlink:href="#center"/>
+        <use xlink:href="#center" transform="rotate(60)"/>
+        <use xlink:href="#center" transform="rotate(120)"/>
+        <use xlink:href="#center" transform="rotate(180)"/>
+        <use xlink:href="#center" transform="rotate(-60)"/>
+        <use xlink:href="#center" transform="rotate(-120)"/>
+        <use xlink:href="#cityg"/>
+        <use xlink:href="#cityg" transform="rotate(180)"/>
+        <use xlink:href="#cityg" transform="rotate(90)"/>
+        <use xlink:href="#cityg" transform="rotate(-90)"/>
+  </g>
   <!-- ground -->
   <g id="t500">
-        <use xlink:href="#hex" fill="white"/>
+        <use xlink:href="#hex" fill="currentColor"/>
   </g>
   <g id="t501">
-        <use xlink:href="#hex" fill="white"/>
+        <use xlink:href="#hex" fill="currentColor"/>
         <use xlink:href="#ditc"/>
   </g>
   <g id="tbig">
-        <use xlink:href="#hex" fill="white"/>
+        <use xlink:href="#hex" fill="currentColor"/>
         <use xlink:href="#cityc"/>
         <text x="25" y="0" font-size="12" transform="scale(.02)">B</text>
   </g>
   <g id="t503">
-        <use xlink:href="#hex" fill="white"/>
+        <use xlink:href="#hex" fill="currentColor"/>
         <use xlink:href="#cityc"/>
   </g>
   <g id="t504">
-        <use xlink:href="#hex" fill="white"/>
+        <use xlink:href="#hex" fill="currentColor"/>
         <use xlink:href="#citys" transform="rotate(-60)"/>
         <use xlink:href="#citys" transform="rotate(120)"/>
   </g>
   <g id="t505">
-        <use xlink:href="#hex" fill="white"/>
+        <use xlink:href="#hex" fill="currentColor"/>
         <use xlink:href="#offboard"/>
   </g>
   <g id="t506">
-        <use xlink:href="#hex" fill="white"/>
+        <use xlink:href="#hex" fill="currentColor"/>
         <use xlink:href="#offboard"/>
         <use xlink:href="#offboard" transform="rotate(60)"/>
   </g>
   <g id="t507">
-        <use xlink:href="#hex" fill="white"/>
+        <use xlink:href="#hex" fill="currentColor"/>
         <use xlink:href="#offboard"/>
         <use xlink:href="#offboard" transform="rotate(60)"/>
         <use xlink:href="#offboard" transform="rotate(120)"/>

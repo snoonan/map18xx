@@ -50,11 +50,13 @@
 (defn hex-down
   [pos-entry pos this]
   (swap! draw-state (fn []
-                        {:in [nil pos]  :last [this pos-entry] :drawing true})))
+                        {:in [nil pos]  :last [this pos-entry] :drawing true}))
+  nil)
 
 (defn hex-up
   []
-  (swap! draw-state assoc-in [:drawing] false))
+  (swap! draw-state assoc-in [:drawing] false)
+  nil)
 
 
 (defn hex-enter
@@ -70,7 +72,8 @@
                (insert-tile (:last @draw-state) nil (:from newdraw)))   ; just the exit leg matters. Do this AFTER testing for both legs.
              (insert-tile (:last newdraw) nil (+ 3 (:from newdraw)))    ; No need to wrap as it will be wrapped later.
              (swap! draw-state (fn [] newdraw))))
-      (swap! draw-state assoc-in [:last] [this pos-entry])))
+      (swap! draw-state assoc-in [:last] [this pos-entry]))
+    nil)
 
 (defn cycle-plain
   [org-tile pos this]
@@ -89,7 +92,7 @@
     static om/Ident
     (ident [this {:keys [pos]}] [:tile/by-pos pos])
     static om/IQuery
-    (query [this] '[:pos :tile :orient])
+    (query [this] '[:pos :tile :orient :overlay :label :color])
     Object
     (render [this]
     (let [{:keys [tile pos orient] :as props} (om/props this)
@@ -98,7 +101,7 @@
           width (if (= rotate 30) 0.86 1.5)
           height (if (= rotate 30) 1.5 0.86)
           ]
-      (dom/g #js { :transform (str "translate("
+      (apply dom/g #js { :transform (str "translate("
                               (+ 4 (* width col)) ","
                               (+ 4 (* height row)) ")"
                               "rotate(" rotate ")")
@@ -111,8 +114,21 @@
                    :onClick
                       (fn [e] (cycle-plain tile pos this))
                   }
-        (dom-use #js {:xlinkHref (str "defs.svg#" tile)
-                  :transform (str "rotate(" (* orient 60) ")")}
-                  (str orient ", points: " pos))))))
+        (-> '()
+        (into (if (contains? props :overlay)
+          (map (fn [[tile orient]] (let [rotate (if orient orient -0.5) ]
+                 (dom-use #js {:xlinkHref (str "defs.svg#" tile)
+                               :transform (str "rotate(" (* rotate 60) ")")}))) (:overlay props)) '()))
+        (into (if (contains? props :label)
+          (list (dom/text #js {:x (get-in props [:label 0 0])
+                         :y (get-in props [:label 0 1])
+                         :fontSize 16 :textAnchor "middle"
+                         :fill "white"
+                         :transform (str "scale(0.02) rotate(-" rotate ")")} (get-in props [:label 1]))) '()))
+        (into (list (dom-use #js {:xlinkHref (str "defs.svg#" tile)
+                      :transform (str "rotate(" (* orient 60) ")")
+                      :color (if (contains? props :color) (:color props) "white")}
+                      )))
+        )))))
 
 (def tile-view (om/factory TileView {:keyfn :pos}))
