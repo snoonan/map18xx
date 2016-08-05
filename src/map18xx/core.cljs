@@ -42,6 +42,14 @@
 (om/add-root! reconciler
   MapView (gdom/getElement "map"))
 
+(defn ^:export game_cmd
+  "Interface to the multi-player js. A command has happened, so pass it on."
+  [c s]
+  (let [fields (string/split s ":") ]
+    ; (if (= "lay-tile" (first fields))
+    (let [[pos tile orient] (rest fields) ]
+    (om/merge! reconciler {[:tile/by-pos  pos] {:pos pos, :tile tile, :orient orient :overlay [] }}))))
+
 ;; Time travel UI
 (timetravel/watch-state (om/app-state reconciler) )
 

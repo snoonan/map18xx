@@ -3,13 +3,31 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">    
+    <!-- peerjs -->
+    <link href="css/fancy.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <script type="text/javascript" src="http://cdn.peerjs.com/0.3/peer.js"></script>
+    <script type="text/javascript" src="js/multi.js"></script>
+    <!-- end peerjs -->
     <link href="css/style.css" rel="stylesheet" type="text/css">
   </head>
   <body>
+  <div id="webrtc" hidden>
+    Your PeerJS ID is <input type="text" id="pid" placeholder="random id"><input class="button" type="button" value="Connect" id="login"><br><br>
+    Connect to a peer: <input type="text" id="rid" placeholder="Someone else's id"><input class="button" type="button" value="Connect" id="connect"><br><br>
+
+    <form id="send">
+      <input type="text" id="text" placeholder="Enter message"><input class="button" type="submit" value="Send to selected peers">
+    </form>
+    <button id="close">Close selected connections</button>
+    <div id="wrap"><div id="connections"><span class="filler">You have not yet made any connections.</span></div>
+    <div class="clear"></div></div>
+  </div>
       <div id="tt"> </div>
   <style>use:not(.stripe) {stroke:black;stroke-width:.1}</style>
   <div id="map"> </div>
     <script src="js/map18xx.js" type="text/javascript"></script>
     <div> Email me at <a href="mailto:snoonan@tbearsiberians.com">snoonan@tbearsiberians.com</a> with questions or comments</div>
+    <script type="text/javascript">game_cmd = map18xx.core.game_cmd;</script>
   </body>
 </html>

@@ -1,6 +1,7 @@
 (ns map18xx.parser
   (:require [om.next :as om :refer-macros [defui]]
             [om.dom :as dom]
+            [clojure.string :as string]
             [map18xx.utils :as utils]
             [map18xx.tiles :as tiles]))
 
@@ -23,4 +24,4 @@
   [{:keys [state] :as env} _ {:keys [pos tile orient]}]
     (if (not (nil? tile))
       {:action
-       (fn [] (swap! state assoc-in [:tile/by-pos pos] {:pos pos :tile tile :orient orient}))}))
+       (fn [] (js/game_cmd_send (string/join ":" ["lay-tile" pos tile orient])) (swap! state assoc-in [:tile/by-pos pos] {:pos pos :tile tile :orient orient}))}))

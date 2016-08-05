@@ -33,6 +33,7 @@
                            :open-urls ["http://localhost:3449/index.html"]}
 
                 :compiler {:main map18xx.core
+                           :externs ["externs.js"]
                            :asset-path "js/compiled/out"
                            :output-to "resources/public/js/map18xx.js"
                            :output-dir "resources/public/js/compiled/out"
@@ -43,6 +44,7 @@
                {:id "min"
                 :source-paths ["src"]
                 :compiler {:output-to "resources/public/js/map18xx.js"
+                           :externs ["resources/public/js/extern.js"]
                            :main map18xx.core
                            :optimizations :advanced
                            :pretty-print false}}]}
@@ -50,6 +52,8 @@
   :figwheel {;; :http-server-root "public" ;; default and assumes "resources"
              ;; :server-port 3449 ;; default
              ;; :server-ip "127.0.0.1"
+             :server-ip   "0.0.0.0"     ;; default is "localhost"
+
 
              :css-dirs ["resources/public/css"] ;; watch and update CSS
 
