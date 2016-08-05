@@ -15,5 +15,5 @@ pages:                      # the build job must be named pages
   script:
     - mkdir public
     - lein cljsbuild once min
-    - cp -r resources/public public
+    - cp -r resources/public/* public
 
