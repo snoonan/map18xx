@@ -1,1 +1,1 @@
-game_cmd_send = function() {};
+var game_cmd_send = function() {};

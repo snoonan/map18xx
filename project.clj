@@ -5,12 +5,11 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
   :min-lein-version "2.6.1"
-  
+
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [org.clojure/clojurescript "1.8.51"]
-                 [org.omcljs/om "1.0.0-alpha38-SNAPSHOT"]]
-                ; [org.omcljs/om "1.0.0-alpha34"]]
-  
+                 [org.omcljs/om "1.0.0-alpha41"]]
+
   :plugins [[lein-figwheel "0.5.4-7"]
             [lein-cljsbuild "1.1.3" :exclusions [[org.clojure/clojure]]]]
 

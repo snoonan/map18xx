@@ -15,10 +15,8 @@
 (defn intersect-track
   [tile edges upgrademaps]
   (if-not (nil? upgrademaps)
-  (let [
-        [tiles upgrades] (first upgrademaps)
-         tile-edges (tiles tile)
-         ]
+  (let [ [tiles upgrades] (first upgrademaps)
+         tile-edges (tiles tile) ]
     (if-not (nil? tile-edges)
       (upgrades (into tile-edges edges))
       (recur tile edges (next upgrademaps))))))
@@ -26,13 +24,11 @@
 (defn upgrade-to
   "Determine tile and orient to upgrade a tile to when adding a path from e1 to e2."
   [{ :keys [pos tile orient]} entry-points]
-  (let [ 
-         exits (if-not (nil? (get entry-points 1)) (assoc entry-points 1 (mod (+ 3 (get entry-points 1)) 6)) entry-points)   ; 3+ to translate from second enter to exit edge
-        real (vec (filter #(not (nil? %)) exits))
+  (let [ exits (if-not (nil? (get entry-points 1)) (assoc entry-points 1 (mod (+ 3 (get entry-points 1)) 6)) entry-points)   ; 3+ to translate from second enter to exit edge
+         real (vec (filter #(not (nil? %)) exits))
          rotated (map #(mod (- % orient) 6) real)   ; normalize input to tile rotation
          ordered (vec (sort rotated))
-        [newtile neworient] (or (intersect-track tile ordered upgrade/upgrademaps) [nil nil])
-        ]
+        [newtile neworient] (or (intersect-track tile ordered upgrade/upgrademaps) [nil nil]) ]
       (if (nil? newtile)
         nil
         {:pos pos :tile newtile :orient (mod (+ orient neworient) 6)})))
@@ -49,8 +45,7 @@
 
 (defn hex-down
   [pos-entry pos this]
-  (swap! draw-state (fn []
-                        {:in [nil pos]  :last [this pos-entry] :drawing true}))
+  (swap! draw-state (fn [] {:in [nil pos]  :last [this pos-entry] :drawing true}))
   nil)
 
 (defn hex-up
