@@ -8,7 +8,6 @@
             [map18xx.tiles :as tiles]
             [map18xx.parser :as p]
             [map18xx.utils :as utils]
-            [map18xx.upg :as u]
             [map18xx.timetravel :as timetravel]
             ))
 
