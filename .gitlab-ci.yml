@@ -1,0 +1,19 @@
+pages:                      # the build job must be named pages
+  artifacts:
+    paths:
+    - public                # this is where the site will live and the Runner uploads it in GitLab
+  only:
+  - master                  # this script is only affecting the master branch
+  before_script:
+    - apt-get update -y
+    - wget https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein
+    - chmod a+x lein
+    - export LEIN_ROOT=1
+    - PATH=$PATH:.
+    - lein deps
+    - lein migratus migrate
+  script:
+    - mkdir public
+    - lein cljsbuild once min
+    - cp -r resources/public public
+
