@@ -41,12 +41,15 @@
           (if (get-in moments i) i nil)))))
 
 (defn watch-state
+  "Retain historical views of the state, but remove the top level tag
+   :ephemeral to allow for non-historically interesting state to be
+   held in the atom"
   [state]
   (do
     (add-watch state :history
       (fn [_ _ _ n]
-        (when-not (= (get-in (@app-history :moments) (@app-history :current-path) nil) n)
-          (swap! app-history add-history n)
+        (when-not (= (get-in (@app-history :moments) (@app-history :current-path) nil) (dissoc n :ephemeral))
+          (swap! app-history add-history (dissoc n :ephemeral))
           )))
     (reset! app-history {:current-path [0] :moments [@state]})))
 

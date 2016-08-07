@@ -9,7 +9,8 @@
 
 (defmethod read :default
     [{:keys [state] :as env} key params]
-      (let [st @state]
+      (let [st @state
+            ]
             (if-let [[_ value] (find st key)]
                     {:value value}
                           {:value :not-found})))
@@ -24,4 +25,17 @@
   [{:keys [state] :as env} _ {:keys [pos tile orient]}]
     (if (not (nil? tile))
       {:action
-       (fn [] (js/game_cmd_send (string/join ":" ["lay-tile" pos tile orient])) (swap! state assoc-in [:tile/by-pos pos] {:pos pos :tile tile :orient orient}))}))
+       (fn [] (js/game_cmd_send (string/join ":" ["lay-tile" pos tile orient]))
+              (swap! state assoc-in [:tile/by-pos pos] {:pos pos :tile tile :orient orient}))}))
+
+(defmethod mutate 'draw/edit-done
+  [{:keys [state] :as env} _ {:keys [pos tile orient]}]
+  {:value {:keys [[:ephemeral :draw :drawing]]}
+   :action
+    (fn [] (swap! state assoc-in [:ephemeral :draw] {:in [] :last nil :drawing false}) (prn (get-in @state [:ephemeral :draw])))})
+
+(defmethod mutate 'draw/edit-edge
+  [{:keys [state] :as env} _ {:keys [this props in]}]
+  {:value {:keys [[:ephemeral :draw :drawing]]}
+   :action
+    (fn [] (swap! state assoc-in [:ephemeral :draw] {:in in :last [this props] :drawing true})(prn (get-in @state [:ephemeral :draw])))})

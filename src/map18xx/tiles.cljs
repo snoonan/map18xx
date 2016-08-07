@@ -23,9 +23,8 @@
 
 (defn upgrade-to
   "Determine tile and orient to upgrade a tile to when adding a path from e1 to e2."
-  [{ :keys [pos tile orient]} entry-points]
-  (let [ exits (if-not (nil? (get entry-points 1)) (assoc entry-points 1 (mod (+ 3 (get entry-points 1)) 6)) entry-points)   ; 3+ to translate from second enter to exit edge
-         real (vec (filter #(not (nil? %)) exits))
+  [{ :keys [pos tile orient]} edges]
+  (let [ real (vec (filter #(not (nil? %)) edges))
          rotated (map #(mod (- % orient) 6) real)   ; normalize input to tile rotation
          ordered (vec (sort rotated))
         [newtile neworient] (or (intersect-track tile ordered upgrade/upgrademaps) [nil nil]) ]
@@ -33,15 +32,20 @@
         nil
         {:pos pos :tile newtile :orient (mod (+ orient neworient) 6)})))
 
-(defn insert-tile
+(defn insert-tile-direct
   "Add a path to a tile."
   [[this pos-entry] e1 e2]
-  (if (not (= e1 (mod (+ 3 e2) 6)))
+  (if (not (= e1 e2))
       (if-let [upgrade (upgrade-to pos-entry [e1 e2])]
         (do
           (om/transact! this `[(hex/lay-tile ~upgrade)])
           true)
       false)))
+
+(defn insert-tile
+  "Add a path to a tile."
+  [[this pos-entry] e1 e2]
+  (insert-tile-direct [this pos-entry] e1 (+ 3 e2)))
 
 (defn hex-down
   [pos-entry pos this]
@@ -83,6 +87,21 @@
         ]
      (om/transact! this `[(hex/lay-tile ~{:pos pos :tile tile :orient 0})])))
 
+(defn hex-edit
+  [props pos this]
+     (om/transact! (om/get-reconciler this) `[(draw/edit-edge ~{:this this :props props :in []}) :ephemeral]))
+
+(defn hex-edge
+  [ this to-edit props in pos ]
+      (let [
+            in' (filter #(not (= pos %)) in)
+            in (if (= in in') (conj in pos) in')
+            insert (apply insert-tile-direct [to-edit props] in)    ; No need to wrap as it will be wrapped later.
+            ]
+        (if insert
+         (om/transact! (om/get-reconciler this) '[(draw/edit-done)])
+         (om/transact! (om/get-reconciler this) `[(draw/edit-edge ~{:this to-edit :props props :in in})]))))
+
 (defui TileView
     static om/Ident
     (ident [this {:keys [pos]}] [:tile/by-pos pos])
@@ -107,7 +126,8 @@
                    :onMouseUp
                       (fn [e] (hex-up))
                    :onClick
-                      (fn [e] (cycle-plain tile pos this))
+                      ;(fn [e] (cycle-plain tile pos this))
+                      (fn [e] (hex-edit props pos this))
                   }
         (-> '()
         (into (if (contains? props :overlay)
@@ -127,3 +147,33 @@
         )))))
 
 (def tile-view (om/factory TileView {:keyfn :pos}))
+
+(defui TileEditView
+    static om/Ident
+    (ident [this id]  [:ephemeral :draw])
+    static om/IQuery
+    (query [this] '[:in :drawing :last])
+    Object
+    (render [this]
+    (let [
+          {:keys [in last drawing]} (om/props this)
+          [to-edit {:keys [pos] :as props}] last
+          [row col] (utils/pos-to-rc pos)
+          rotate  (:rotate board/app-state)
+          width (if (= rotate 30) 0.86 1.5)
+          height (if (= rotate 30) 1.5 0.86)
+          _ (prn "update")
+          ]
+       (if drawing
+         (dom/g #js { :transform (str "translate(" (+ 4 (* width col)) "," (+ 4 (* height row)) ") "
+                              "rotate(" rotate ") scale(1.5)")
+                      :id "upgrade-select" }
+             (into [(dom-use #js {:xlinkHref (str "defs.svg#hex")
+                                  :transform (str "rotate(0)")
+                                  :fill "blue" :opacity "0.1"})]
+                (for [orient [0 1 2 3 4 5]]
+                   (dom-use #js {:xlinkHref (str "defs.svg#cityc")
+                                 :transform (str "rotate(" (* 60  (+ 3 orient)) ") translate(0,0.866)")
+                                 :onClick (fn [e] (hex-edge this to-edit props in orient))}))))))))
+
+(def tile-edit-view (om/factory TileEditView {:keyfn :drawing}))

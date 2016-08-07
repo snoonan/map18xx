@@ -1,7 +1,7 @@
 (ns map18xx.utils)
 
 (defn pos-to-rc
- "Translate L## into (x y)"
+ "Translate L## into (y x)"
  [pos]
  (if-let [[row & col] pos]
  [(- (.charCodeAt row 0) 97) (reduce #(+ (* %1 10) (int %2)) col) ]

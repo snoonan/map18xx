@@ -15,7 +15,7 @@
 (defui MapView
        static om/IQuery
        (query [this]
-              [{:tiles (om/get-query tiles/TileView)}])
+              [{:tiles (om/get-query tiles/TileView)} { :ephemeral [:draw] }])
        Object
        (render [this]
                (let [scale 30
@@ -23,6 +23,7 @@
                      rotate  (:rotate board/app-state)
                      width (if (= rotate 30) 0.86 1.5)
                      height (if (= rotate 30) 1.5 0.86)
+                     edit-select (tiles/tile-edit-view (-> this om/props :ephemeral :draw))
                      [mx my] (reduce #(
                                let [[y x] (utils/pos-to-rc (:pos %2))
                                     [maxx maxy] %1]
@@ -30,8 +31,7 @@
                                     ) [0 0] tiles)]
                  (dom/svg #js {:width (* (+ mx 8) width scale) :height (* (+ my 8) height scale)}
                   (dom/g #js {:transform (str "scale("scale")")}
-                   (mapv tiles/tile-view tiles))
-                  (dom/g #js {:id "upgrade-select" :transform (str "scale("scale")")})))))
+                   (conj (mapv tiles/tile-view tiles) edit-select ))))))
 
 (def reconciler
   (om/reconciler
