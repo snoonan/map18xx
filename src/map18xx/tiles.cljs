@@ -99,8 +99,8 @@
             insert (apply insert-tile-direct [to-edit props] in)    ; No need to wrap as it will be wrapped later.
             ]
         (if insert
-         (om/transact! (om/get-reconciler this) '[(draw/edit-done)])
-         (om/transact! (om/get-reconciler this) `[(draw/edit-edge ~{:this to-edit :props props :in in})]))))
+         (om/transact! this '[(draw/edit-done)])
+         (om/transact! this `[(draw/edit-edge ~{:this to-edit :props props :in in})]))))
 
 (defui TileView
     static om/Ident
@@ -162,7 +162,6 @@
           rotate  (:rotate board/app-state)
           width (if (= rotate 30) 0.86 1.5)
           height (if (= rotate 30) 1.5 0.86)
-          _ (prn "update")
           ]
        (if drawing
          (dom/g #js { :transform (str "translate(" (+ 4 (* width col)) "," (+ 4 (* height row)) ") "
@@ -172,8 +171,9 @@
                                   :transform (str "rotate(0)")
                                   :fill "blue" :opacity "0.1"})]
                 (for [orient [0 1 2 3 4 5]]
-                   (dom-use #js {:xlinkHref (str "defs.svg#cityc")
+                   (dom-use #js {:xlinkHref (str "defs.svg#target")
                                  :transform (str "rotate(" (* 60  (+ 3 orient)) ") translate(0,0.866)")
+                                 :color (if (= in (filter #(not (= orient %)) in)) "white" "green")
                                  :onClick (fn [e] (hex-edge this to-edit props in orient))}))))))))
 
 (def tile-edit-view (om/factory TileEditView {:keyfn :drawing}))

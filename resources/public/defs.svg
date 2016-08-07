@@ -5,6 +5,7 @@
   xmlns:xlink="http://www.w3.org/1999/xlink"
   >
 <defs id="theme" src="default_theme.svg">
+  <circle id="target"   r=".25" fill="currentColor" stroke="black" stroke-width="0.02"/>
   <path   id="hex"      d="M -1 0 l .5 .86 l 1 0 l .5 -.86 l -.5 -.86 l -1 0 z" stroke="black" stroke-width="0.01"></path>
   <path   id="straight" d="M 0 -.86 l 0 1.72" ></path>
   <path   id="center"   d="M 0 -.86 l 0 .86" ></path>

@@ -15,6 +15,18 @@
                     {:value value}
                           {:value :not-found})))
 
+(defmethod read :in
+    [{:keys [state] :as env} key params]
+      { :value (get-in @state [:ephemeral :draw :in]) })
+
+(defmethod read :drawing
+    [{:keys [state] :as env} key params]
+      { :value (get-in @state [:ephemeral :draw :drawing]) })
+
+(defmethod read :last
+    [{:keys [state] :as env} key params]
+      { :value (get-in @state [:ephemeral :draw :last]) })
+
 (defmethod read :tiles
     [{:keys [state] :as env} key params]
       { :value (into [] (map #(get-in @state %) (get @state key))) })
@@ -32,10 +44,10 @@
   [{:keys [state] :as env} _ {:keys [pos tile orient]}]
   {:value {:keys [[:ephemeral :draw :drawing]]}
    :action
-    (fn [] (swap! state assoc-in [:ephemeral :draw] {:in [] :last nil :drawing false}) (prn (get-in @state [:ephemeral :draw])))})
+    (fn [] (swap! state assoc-in [:ephemeral :draw] {:in [] :last nil :drawing false}))})
 
 (defmethod mutate 'draw/edit-edge
   [{:keys [state] :as env} _ {:keys [this props in]}]
   {:value {:keys [[:ephemeral :draw :drawing]]}
    :action
-    (fn [] (swap! state assoc-in [:ephemeral :draw] {:in in :last [this props] :drawing true})(prn (get-in @state [:ephemeral :draw])))})
+    (fn [] (swap! state assoc-in [:ephemeral :draw] {:in in :last [this props] :drawing true}))})
