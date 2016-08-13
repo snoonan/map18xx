@@ -78,19 +78,19 @@
          [:current-path])
   Object
   (render [this]
-          (dom/table nil
-           (dom/thead nil
-             (dom/tr nil
-               (let [path (:current-path (om/props this))  ]
-                 (if-not (and (= (count path) 1) (= (first path) 0))
-                   (dom/th nil (dom/button #js {:onClick #(timetravel/undo (om/app-state reconciler))} "Undo"))
-                   ))
-               (dom/th nil (dom/button #js {:onClick #(timetravel/redo (om/app-state reconciler))} "Redo"))))
-           (dom/tbody nil
-            (map #(dom/tr nil %) (timetravel/transform-to-grid
-                               #(span-view {:span %3 :path (string/join "-" [%1 %2])})
-                               #(moment-view {:moment %1 :current %2})
-                               @timetravel/app-history))))))
+          (dom/div nil
+             (let [path (:current-path (om/props this))  ]
+               (if-not (and (= (count path) 1) (= (first path) 0))
+                 (dom/button #js {:onClick #(timetravel/undo (om/app-state reconciler))} "Undo")
+                 ))
+             (dom/button #js {:onClick #(timetravel/redo (om/app-state reconciler))} "Redo")
+             (dom/br nil)
+             (dom/table nil
+               (dom/tbody nil
+                (map #(dom/tr nil %) (timetravel/transform-to-grid
+                                   #(span-view {:span %3 :path (string/join "-" [%1 %2])})
+                                   #(moment-view {:moment %1 :current %2})
+                                 @timetravel/app-history)))))))
 
 (def tt-reconciler
   (om/reconciler

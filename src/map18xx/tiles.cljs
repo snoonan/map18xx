@@ -74,18 +74,6 @@
       (swap! draw-state assoc-in [:last] [this pos-entry]))
     nil)
 
-(defn cycle-plain
-  [org-tile pos this]
-  (if-let [
-        tile (condp == org-tile
-                "t500"  "tbig"
-                "tbig"  "t503"
-                "t503"  "t501"
-                "t501"  "t500"
-                nil
-                )
-        ]
-     (om/transact! this `[(hex/lay-tile ~{:pos pos :tile tile :orient 0})])))
 
 (defn hex-edit
   [props pos this]
@@ -95,8 +83,13 @@
   [ this to-edit props in pos ]
       (let [
             in' (filter #(not (= pos %)) in)
-            in (if (= in in') (conj in pos) in')
-            insert (apply insert-tile-direct [to-edit props] in)    ; No need to wrap as it will be wrapped later.
+            in (if (= in in') (conj (if (keyword pos) (filter #(not (keyword? %)) in) in) pos) in')
+            check-in (filter #(not (keyword? %)) in)
+            new-tile (some #(if (keyword? %) % false) in)
+            tile (:tile props)
+            tile (if new-tile (name new-tile) tile)
+            new-props (assoc props :tile tile)
+            insert (apply insert-tile-direct [to-edit new-props] check-in)    ; No need to wrap as it will be wrapped later.
             ]
         (if insert
          (om/transact! this '[(draw/edit-done)])
@@ -126,7 +119,6 @@
                    :onMouseUp
                       (fn [e] (hex-up))
                    :onClick
-                      ;(fn [e] (cycle-plain tile pos this))
                       (fn [e] (hex-edit props pos this))
                   }
         (-> '()
@@ -157,7 +149,7 @@
     (render [this]
     (let [
           {:keys [in last drawing]} (om/props this)
-          [to-edit {:keys [pos] :as props}] last
+          [to-edit {:keys [pos tile] :as props}] last
           [row col] (utils/pos-to-rc pos)
           rotate  (:rotate board/app-state)
           width (if (= rotate 30) 0.86 1.5)
@@ -167,13 +159,27 @@
          (dom/g #js { :transform (str "translate(" (+ 4 (* width col)) "," (+ 4 (* height row)) ") "
                               "rotate(" rotate ") scale(1.5)")
                       :id "upgrade-select" }
-             (into [(dom-use #js {:xlinkHref (str "defs.svg#hex")
+             (-> [(dom-use #js {:xlinkHref (str "defs.svg#hex")
                                   :transform (str "rotate(0)")
                                   :fill "blue" :opacity "0.1"})]
-                (for [orient [0 1 2 3 4 5]]
+                 (into (if (= "t500" tile)
+                        [(dom-use #js {:xlinkHref (str "defs.svg#target")
+                                       :transform (str "translate(0.25,0)")
+                                       :color (if (= in (filter #(not (= :t503 %)) in)) "white" "green")
+                                       :onClick (fn [e] (hex-edge this to-edit props in :t503))})
+                         (dom-use #js {:xlinkHref (str "defs.svg#btarget")
+                                       :transform (str "translate(-0.125,-0.216)")
+                                       :color (if (= in (filter #(not (= :tbig %)) in)) "white" "green")
+                                       :onClick (fn [e] (hex-edge this to-edit props in :tbig))})
+                         (dom-use #js {:xlinkHref (str "defs.svg#dit")
+                                       :transform (str "translate(-0.125,0.216)")
+                                       :color (if (= in (filter #(not (= :t501 %)) in)) "black" "green")
+                                       :onClick (fn [e] (hex-edge this to-edit props in :t501))})]
+                         []))
+                 (into (for [orient [0 1 2 3 4 5]]
                    (dom-use #js {:xlinkHref (str "defs.svg#target")
                                  :transform (str "rotate(" (* 60  (+ 3 orient)) ") translate(0,0.866)")
                                  :color (if (= in (filter #(not (= orient %)) in)) "white" "green")
-                                 :onClick (fn [e] (hex-edge this to-edit props in orient))}))))))))
+                                 :onClick (fn [e] (hex-edge this to-edit props in orient))})))))))))
 
 (def tile-edit-view (om/factory TileEditView {:keyfn :drawing}))

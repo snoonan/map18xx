@@ -6,22 +6,37 @@
   >
 <defs id="theme" src="default_theme.svg">
   <circle id="target"   r=".25" fill="currentColor" stroke="black" stroke-width="0.02"/>
-  <path   id="hex"      d="M -1 0 l .5 .86 l 1 0 l .5 -.86 l -.5 -.86 l -1 0 z" stroke="black" stroke-width="0.01"></path>
-  <path   id="straight" d="M 0 -.86 l 0 1.72" ></path>
-  <path   id="center"   d="M 0 -.86 l 0 .86" ></path>
-  <path   id="sharp"    d="M 0 -.86 a .5 .5 0 0 0 .75 .43" fill="none"></path>
-  <path   id="gentle"   d="M 0 -.86 a 1.5 1.5 0 0 0 .75 1.29" fill="none"></path>
+  <path   id="hex"      d="M -1 0 l .5 .86 l 1 0 l .5 -.86 l -.5 -.86 l -1 0 z" stroke="black" stroke-width="0.02"></path>
+  <path   id="straightb" d="M 0 -.43 L 0 .43" stroke="white" stroke-width="0.12"></path>
+  <path   id="straightc" d="M 0 -.86 L 0 .83" ></path>
+  <path   id="center"   d="M 0 -.86 L 0 0" ></path>
+  <path   id="sharp"    d="M 0 -.86 A .5 .5 0 0 0 .75 -.43" fill="none"></path>
+  <path   id="gentleb"   d="M 0.09 -.347 A 1.5 1.5 0 0 0 .35 .104" fill="none" stroke="white" stroke-width="0.12"></path>
+  <path   id="gentlec"   d="M 0 -.86 A 1.5 1.5 0 0 0 .75 .43" fill="none"></path>
   <circle id="cityc"    r=".25" fill="white" stroke="black" stroke-width="0.02"/>
   <use    id="cityg"    xlink:href="#cityc" transform="translate(0.2,-0.15)"/>
   <use    id="citys"    xlink:href="#cityc" transform="translate(0.2,-0.4)"/>
-  <circle id="ditc"     r=".15" fill="black" stroke="black" stroke-width="0.02"/>
-  <use    id="ditg"     xlink:href="#ditc" transform="translate(0.2,-0.15)"/>
-  <use    id="dits"     xlink:href="#ditc" transform="translate(0.2,-0.4)"/>
+  <circle id="dit"      r=".15" fill="currentColor" stroke="black" stroke-width="0.02"/>
+  <use    id="ditc"     xlink:href="#dit" color="black"/>
+  <use    id="ditg"     xlink:href="#dit" color="black" transform="translate(0.2,-0.15)"/>
+  <use    id="dits"     xlink:href="#dit" color="black" transform="translate(0.2,-0.4)"/>
   <path   id="offboard" d="M -0.15 -.86 l 0.3 0 l -0.15 .26 z" fill="black" stroke-width="0.01"></path>
   <path   id="water"    d="M -.75 0 Q -.5 -.25 -.25 0 Q 0 .25 .25 0 Q .5 -.25 .75 0" stroke="black" stroke-width="0.05" fill="none"/>
   <path   id="mountain" d="M -.33 .33 L 0 -.33 L .33 .33 z" stroke="black" stroke-width="0.05" fill="none"/>
-  <path   id="tributary" d="M -1 0 l .5 .86" stroke="blue" stroke-width="0.18" fill="none"/>
+  <path   id="tributary" d="M -1 0 L -.5 .86" stroke="blue" stroke-width="0.18" fill="none"/>
   <!-- terrain -->
+  <g id="btarget">
+        <use xlink:href="#target"/>
+        <text x="0" y="0" font-size="12" transform="scale(.02)">B</text>
+  </g>
+  <g id="straight">
+        <use xlink:href="#straightb"/>
+        <use xlink:href="#straightc"/>
+  </g>
+  <g id="gentle">
+        <use xlink:href="#gentleb"/>
+        <use xlink:href="#gentlec"/>
+  </g>
   <g id="tmountain">
         <use xlink:href="#mountain"/>
   </g>
@@ -282,8 +297,8 @@
         <use xlink:href="#hex" fill="green"/>
         <use xlink:href="#gentle"/>
         <use xlink:href="#gentle" transform="rotate(60)"/>
-        <use xlink:href="#citys" transform="rotate(90)"/>
-        <use xlink:href="#citys" transform="rotate(0)"/>
+        <use xlink:href="#citys" transform="rotate(150)"/>
+        <use xlink:href="#citys" transform="rotate(-30)"/>
   </g>
   <g id="t36">
         <use xlink:href="#hex" fill="green"/>
