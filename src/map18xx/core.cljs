@@ -9,6 +9,7 @@
             [map18xx.parser :as p]
             [map18xx.utils :as utils]
             [map18xx.timetravel :as timetravel]
+            [map18xx.upg :as upg]
             ))
 
 

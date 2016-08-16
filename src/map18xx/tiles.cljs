@@ -2,7 +2,7 @@
   (:require [om.next :as om :refer-macros [defui]]
             [om.dom :as dom]
             [cljsjs.react]
-            [map18xx.upgrade :as upgrade]
+            [map18xx.upg :as upg]
             [map18xx.map1820 :as board]
             [map18xx.utils :as utils]
             ))
@@ -25,12 +25,10 @@
   "Determine tile and orient to upgrade a tile to when adding a path from e1 to e2."
   [{ :keys [pos tile orient]} edges]
   (let [ real (vec (filter #(not (nil? %)) edges))
-         rotated (map #(mod (- % orient) 6) real)   ; normalize input to tile rotation
-         ordered (vec (sort rotated))
-        [newtile neworient] (or (intersect-track tile ordered upgrade/upgrademaps) [nil nil]) ]
+        [neworient newtile] (upg/unique-path? tile orient real) ]
       (if (nil? newtile)
         nil
-        {:pos pos :tile newtile :orient (mod (+ orient neworient) 6)})))
+        {:pos pos :tile newtile :orient neworient})))
 
 (defn insert-tile-direct
   "Add a path to a tile."
@@ -45,7 +43,7 @@
 (defn insert-tile
   "Add a path to a tile."
   [[this pos-entry] e1 e2]
-  (insert-tile-direct [this pos-entry] e1 (+ 3 e2)))
+  (insert-tile-direct [this pos-entry] e1 (mod (+ 3 e2) 6)))
 
 (defn hex-down
   [pos-entry pos this]
