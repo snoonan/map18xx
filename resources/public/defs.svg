@@ -13,13 +13,8 @@
   <path   id="sharp"    d="M 0 -.86 A .5 .5 0 0 0 .75 -.43" fill="none"></path>
   <path   id="gentleb"   d="M 0.09 -.347 A 1.5 1.5 0 0 0 .35 .104" fill="none" stroke="white" stroke-width="0.12"></path>
   <path   id="gentlec"   d="M 0 -.86 A 1.5 1.5 0 0 0 .75 .43" fill="none"></path>
-  <circle id="cityc"    r=".25" fill="white" stroke="black" stroke-width="0.02"/>
-  <use    id="cityg"    xlink:href="#cityc" transform="translate(0.2,-0.15)"/>
-  <use    id="citys"    xlink:href="#cityc" transform="translate(0.2,-0.4)"/>
+  <circle id="city"     r=".25" fill="white" stroke="black" stroke-width="0.02"/>
   <circle id="dit"      r=".15" fill="currentColor" stroke="black" stroke-width="0.02"/>
-  <use    id="ditc"     xlink:href="#dit" color="black"/>
-  <use    id="ditg"     xlink:href="#dit" color="black" transform="translate(0.2,-0.15)"/>
-  <use    id="dits"     xlink:href="#dit" color="black" transform="translate(0.2,-0.4)"/>
   <path   id="offboard" d="M -0.15 -.86 l 0.3 0 l -0.15 .26 z" fill="black" stroke-width="0.01"></path>
   <path   id="water"    d="M -.75 0 Q -.5 -.25 -.25 0 Q 0 .25 .25 0 Q .5 -.25 .75 0" stroke="black" stroke-width="0.05" fill="none"/>
   <path   id="mountain" d="M -.33 .33 L 0 -.33 L .33 .33 z" stroke="black" stroke-width="0.05" fill="none"/>

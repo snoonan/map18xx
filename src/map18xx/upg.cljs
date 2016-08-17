@@ -1,9 +1,3 @@
-; Need to compile description into a upgrade list, then use THAT at runtime to do upgrades
-; upgrade list contains:
-; "t803" {"t68" {} "t68" {"o." 2 "mU" "Z" "mZ" "U"} "t212" {} ...}
-; upg takes list, attempts to apply transforms sequentially til one works, then applys the transform to the original tile metadata and replaces the type
-; most of the code here goes to compiler except rotate related items.
-
 (ns map18xx.upg
   (:require [clojure.string :as string]
             [map18xx.map1820 :as board]))
@@ -111,3 +105,4 @@
         rotated (map (fn [[k v]] (rotate-edges k (get-edges (board/track-list (first v))))) options)
         same (apply = rotated) ]
     (if (and (not popular) same) [(first (first options)) (first (second (first options)))] nil)))
+

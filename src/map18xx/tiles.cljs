@@ -9,6 +9,8 @@
 
 (def draw-state (atom {}))
 
+(declare draw-tile)
+
 ; Because react.dom does not have an entry for 'use' so create one here.
 (def dom-use (js/React.createFactory "use"))
 
@@ -130,11 +132,8 @@
                          :fontSize 16 :textAnchor "middle"
                          :fill "white"
                          :transform (str "scale(0.02) rotate(-" rotate ")")} (get-in props [:label 1]))) '()))
-        (into (list (dom-use #js {:xlinkHref (str "defs.svg#" tile)
-                      :transform (str "rotate(" (* orient 60) ")")
-                      :color (if (contains? props :color) (:color props) "white")}
-                      )))
-        )))))
+        (conj 
+                (draw-tile tile orient (:color props))))))))
 
 (def tile-view (om/factory TileView {:keyfn :pos}))
 
@@ -181,3 +180,106 @@
                                  :onClick (fn [e] (hex-edge this to-edit props in orient))})))))))))
 
 (def tile-edit-view (om/factory TileEditView {:keyfn :drawing}))
+
+;; negative colors are spaced by two so no upgrades are possible
+(def hex-colors {0 "white"
+                 1 "yellow"
+                 2 "green"
+                 3 "brown"
+                 4 "lightgrey"
+                 -2 "grey"
+                 -4 "red"
+                 -6 "blue"})
+
+;; points in a hex with a unit side centered around the origin
+(def hex-points {0   [ 0     -0.866]
+                 1   [ 0.750 -0.443]
+                 2   [ 0.750  0.443]
+                 3   [ 0      0.866]
+                 4   [-0.750  0.443]
+                 5   [-0.750 -0.443]
+                 "A" [ 0      0]
+                 "B" [ 0     -0.216]
+                 "C" [ 0.125 -0.216]
+                 "D" [ 0.188 -0.108]
+                 "E" [ 0.250  0]
+                 "F" [ 0.188  0.108]
+                 "G" [ 0.125  0.216]
+                 "H" [ 0      0.216]
+                 "I" [-0.125  0.216]
+                 "J" [-0.188  0.108]
+                 "K" [-0.250  0]
+                 "L" [-0.188 -0.108]
+                 "M" [-0.125 -0.216]
+                 "N" [ 0     -0.577]
+                 "Z" [ 0.250 -0.443]
+                 "P" [ 0.500 -0.289]
+                 "Q" [ 0.500  0]
+                 "R" [ 0.500  0.289]
+                 "S" [ 0.250  0.443]
+                 "T" [ 0      0.577]
+                 "U" [-0.250  0.443]
+                 "V" [-0.500  0.289]
+                 "W" [-0.500  0]
+                 "X" [-0.500 -0.289]
+                 "Y" [-0.250 -0.443]
+                 })
+
+(defn draw-tile
+  [tile orient color]
+  (let [tile-info (board/track-list tile)
+        _ (prn tile color)
+        color (or color (hex-colors (get tile-info "p.")))
+        _ (prn tile-info color)
+        ]
+(dom/g #js { :transform (str "rotate(" (* orient 60) ")") }
+    (reduce
+          (fn [a [[op location] v]]
+            (let [location-real (or (tile-info (str "a" location)) location)
+                  stations (or (tile-info (str "r" location)) location-real)
+                  _ (prn op location location-real stations tile-info)
+                  ]
+             (-> a
+              (into (if (sequential? v)
+                      (for [track-set (if (sequential? (first v)) v (if (= 2 (count v)) [v] (map (fn [x] [location-real x]) v)))]
+                        (let [[e1 e2] track-set]
+                          (if-not (and (number? e1) (number? e2))
+                            (dom/path #js {:d (str "M" ((get hex-points e1) 0) " "
+                                                       ((get hex-points e1) 1)
+                                                   "L" ((get hex-points e2) 0) " "
+                                                       ((get hex-points e2) 1))
+                                           :stroke "black" :strokeWidth 0.1})
+                            (case (- e2 e1)
+                              1 (dom-use #js {:xlinkHref (str "defs.svg#sharp")
+                                           :transform (str "rotate(" (* e1 60) ")")})
+                              2 (dom-use #js {:xlinkHref (str "defs.svg#gentle")
+                                           :transform (str "rotate(" (* e1 60) ")")})
+                              3 (dom-use #js {:xlinkHref (str "defs.svg#straight")
+                                           :transform (str "rotate(" (* e1 60) ")")})
+                              4 (dom-use #js {:xlinkHref (str "defs.svg#gentle")
+                                           :transform (str "rotate(" (* e2 60) ")")})
+                              5 (dom-use #js {:xlinkHref (str "defs.svg#sharp")
+                                           :transform (str "rotate(" (* e2 60) ")")}))))
+                                       ) [] ))
+              (into (case op
+                "c" (into
+                      (for [loc stations]
+                       (dom-use #js {:xlinkHref (str "defs.svg#city")
+                                     :transform (str "translate(" ((get hex-points loc) 0)","((get hex-points loc) 1) ")")}))
+                      (for [loc1 stations loc2 stations]
+                       (dom/path #js {:d (str "M" ((get hex-points loc1) 0) " "
+                                                  ((get hex-points loc1) 1) " "
+                                             "L " ((get hex-points loc2) 0) " "
+                                                  ((get hex-points loc2) 1))
+                                      :stroke "white"
+                                      :strokeWidth 0.5})))
+                "d" (for [loc stations]
+                       (dom-use #js {:xlinkHref (str "defs.svg#dit")
+                                     :transform (str "translate(" ((get hex-points loc) 0)","((get hex-points loc) 1) ")")}))
+                "l" [(dom/text #js {:x (* 50 ((get hex-points location) 0)) :y (* 50 ((get hex-points location) 1))
+                                    :fontSize 16 :textAnchor "middle"
+                                    :fill "black"
+                                    :transform "scale(.02)"} v)]
+                nil)))))
+            [ (dom-use #js {:xlinkHref (str "defs.svg#hex") :fill color}) ] tile-info))))
+
