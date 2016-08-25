@@ -23,7 +23,6 @@
     (render [this]
     (let [{:keys [:ephemeral/operating :company-list] :as props} (om/props this)
           selected (:selected operating)
-          _ (prn (om/props this))
           ]
          (dom/ul #js { :id "company-select" }
                  (for [company company-list]

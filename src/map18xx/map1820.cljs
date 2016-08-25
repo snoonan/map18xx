@@ -148,7 +148,14 @@
             { :pos "p4"  :tile "t505" :orient 5 :label [[0 -10] "20/30/30/20"] :color "blue" }
             { :pos "p12" :tile "t505" :orient 0 :label [[0 -10] "20/30/40/20"] :color "blue" }
             { :pos "p16" :tile "t505" :orient 0 :label [[0 -10] "20/30/30/40"] :color "blue" }
-            ]})
+            ]
+  :companies [
+              {:name "red" :token "red"}
+              {:name "green" :token "green"}
+              {:name "blue" :token "blue"}
+              {:name "yellow" :token "yellow"}
+              {:name "magenta" :token "magenta"}
+              ]})
 
 ; {[opcode & rest] :as key] ends <key> <ends> ...}
 ; opcode:
@@ -228,11 +235,11 @@
 
 (def track-dits {
                 "t501" { "p." 0 "dA" []}
-                "t3"   { "p." 1 "dA" [0 1] "vA" 10}
-                "t58"  { "p." 1 "dA" [0 2] "vA" 10}
+                "t3"   { "p." 1 "dA" [0 1] "aA" "Z" "vA" 10}
+                "t58"  { "p." 1 "dA" [0 2] "aA" "D" "vA" 10}
                 "t4"   { "p." 1 "dA" [0 3] "vA" 10}
-                "t3g"  { "p." 2 "dA" [0 1] "vA" 20}
-                "t58g" { "p." 2 "dA" [0 2] "vA" 20}
+                "t3g"  { "p." 2 "dA" [0 1] "aA" "Z" "vA" 20}
+                "t58g" { "p." 2 "dA" [0 2] "aA" "D" "vA" 20}
                 "t4g"  { "p." 2 "dA" [0 3] "vA" 20}
                 "t143" { "p." 3 "dA" [0 1 2] "vA" 30}
                 "t142" { "p." 3 "dA" [0 1 3] "vA" 30}

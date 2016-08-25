@@ -56,12 +56,14 @@
    held in the atom"
   [state]
   (do
+    (remove-watch state :history)
+    (reset! app-history {:current-path [0] :moments [@state]})
     (add-watch state :history
       (fn [_ _ _ n]
-        (when-not (= (get-in (@app-history :moments) (@app-history :current-path) nil) (dissoc n :ephemeral))
-          (swap! app-history add-history (dissoc n :ephemeral))
-          )))
-    (reset! app-history {:current-path [0] :moments [@state]})))
+        (when-not (= (get-in (@app-history :moments) (@app-history :current-path) nil)
+                     (select-keys n (filter #(not= "ephemeral" (namespace %)) (keys n))))
+          (swap! app-history add-history
+                 (select-keys n (filter #(not= "ephemeral" (namespace %)) (keys n)))))))))
 
 (defn undo
   [app-state]

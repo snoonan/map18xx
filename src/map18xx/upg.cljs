@@ -37,7 +37,6 @@
   [m]
   (let [track-keys (filter #(substring? (first %) ".cd") (keys m))
         merged (map-by-type track-keys m)]
-        ;merged (map-with-keys track-keys m)]
      (if (contains? merged ".") (update merged "." first) merged)))
 
 (defn- in-list [x y] (filter #(some (partial = %) y) x))
@@ -50,20 +49,11 @@
   "Remove entries from up-to that are in up-from, nil if something is in up-from but not up-to. Return remaining items"
   [up-to up-from orient]
   (let [
-        ;_ (prn )
-        ;_ (prn "up-to" up-to)
-        ;_ (prn "up-from" up-from)
-        ;_ (prn "orient" orient)
         track-map (rotate-edges orient (get-edges up-to))
-        ;_ (prn "track-map" track-map)
         from-map (get-edges up-from)
-        ;_ (prn "from-map" from-map)
         ; If all lists in from-map have supersets in track-map then true
         filtered (map (fn [[k v]] (all-in-lists (get from-map k) (get track-map k))) from-map)
-        ;_ (prn "filtered" filtered)
         missed (some false? filtered)
-        ;_ (prn "missed" missed)
-        ;_ (prn "mismatch" (or (some nil? filtered) missed))
         ]
     (not (or (some nil? filtered) missed))))
 
@@ -106,3 +96,16 @@
         same (apply = rotated) ]
     (if (and (not popular) same) [(first (first options)) (first (second (first options)))] nil)))
 
+(defn upgrade
+  [tile orient edges]
+  (let [[new-orient new-tile] (unique-path? tile orient edges)
+        new-spec (board/track-list new-tile)
+        org-spec (board/track-list tile)
+        new-merge-keys (filter #(substring? (first %) "m") (keys new-spec))
+        new-city-keys (filter #(substring? (first %) "c") (keys new-spec))
+        org-city-keys (filter #(substring? (first %) "c") (keys org-spec))
+        new-rotated  (reduce #(assoc %1 (second %2) (rotate-set new-orient (new-spec %2))) {} new-city-keys)
+        org-rotated  (reduce #(assoc %1 (second %2) (rotate-set orient (org-spec %2))) {} org-city-keys)
+        merge-keys (merge (select-keys new-spec new-merge-keys) (reduce (fn [a [k v]] (merge a {k (some #(if (in-lists v [(second %)]) (first %)) new-rotated)})) {} org-rotated))
+        ]
+    [merge-keys {:orient new-orient :tile new-tile}]))

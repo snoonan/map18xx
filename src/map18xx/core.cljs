@@ -5,6 +5,7 @@
             [clojure.string :as string]
             [clojure.walk :as walk]
             [map18xx.map1820 :as board]
+            [map18xx.companies :as companies]
             [map18xx.tiles :as tiles]
             [map18xx.parser :as p]
             [map18xx.utils :as utils]
@@ -16,23 +17,30 @@
 (defui MapView
        static om/IQuery
        (query [this]
-              [{:tiles (om/get-query tiles/TileView)} { :ephemeral [:draw] }])
+              [{:tiles (om/get-query tiles/TileView)}
+               {:companies [:name :color]}
+               {:ephemeral/draw (om/get-query tiles/TileEditView)}
+               {:ephemeral/operating [:selected]}])
        Object
        (render [this]
                (let [scale 30
                      tiles (-> this om/props :tiles)
+                     companies (-> this om/props :companies)
                      rotate  (:rotate board/app-state)
                      width (if (= rotate 30) 0.86 1.5)
                      height (if (= rotate 30) 1.5 0.86)
-                     edit-select (tiles/tile-edit-view (-> this om/props :ephemeral :draw))
+                     edit-select (tiles/tile-edit-view (-> this om/props :ephemeral/draw))
                      [mx my] (reduce #(
                                let [[y x] (utils/pos-to-rc (:pos %2))
                                     [maxx maxy] %1]
                                    [(max x maxx) (max y maxy)]
                                     ) [0 0] tiles)]
+                (dom/div nil
                  (dom/svg #js {:width (* (+ mx 8) width scale) :height (* (+ my 8) height scale)}
-                  (dom/g #js {:transform (str "scale("scale")")}
-                   (conj (mapv tiles/tile-view tiles) edit-select ))))))
+                  (apply dom/g #js {:transform (str "scale("scale")")}
+                   (conj (mapv tiles/tile-view tiles) edit-select )))
+                 (companies/company-edit-view {:company-list companies :ephemeral/operating { :selected (-> this om/props :ephemeral/operating :selected) }} this)
+                 ))))
 
 (def reconciler
   (om/reconciler
@@ -87,8 +95,8 @@
              (dom/button #js {:onClick #(timetravel/redo (om/app-state reconciler))} "Redo")
              (dom/br nil)
              (dom/table nil
-               (dom/tbody nil
-                (map #(dom/tr nil %) (timetravel/transform-to-grid
+               (apply dom/tbody nil
+                (map #(apply dom/tr nil %) (timetravel/transform-to-grid
                                    #(span-view {:span %3 :path (string/join "-" [%1 %2])})
                                    #(moment-view {:moment %1 :current %2})
                                  @timetravel/app-history)))))))

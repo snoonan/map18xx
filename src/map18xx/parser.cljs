@@ -9,23 +9,18 @@
 
 (defmethod read :default
     [{:keys [state] :as env} key params]
-      (let [st @state
-            ]
+      (let [st @state ]
             (if-let [[_ value] (find st key)]
                     {:value value}
-                          {:value :not-found})))
+                    {:value :not-found})))
 
-(defmethod read :in
+(defmethod read :ephemeral/draw
     [{:keys [state] :as env} key params]
-      { :value (get-in @state [:ephemeral :draw :in]) })
+      { :value (get-in @state [:ephemeral/draw]) })
 
-(defmethod read :drawing
+(defmethod read :ephemeral/operating
     [{:keys [state] :as env} key params]
-      { :value (get-in @state [:ephemeral :draw :drawing]) })
-
-(defmethod read :last
-    [{:keys [state] :as env} key params]
-      { :value (get-in @state [:ephemeral :draw :last]) })
+      { :value (get-in @state [:ephemeral/operating]) })
 
 (defmethod read :tiles
     [{:keys [state] :as env} key params]
@@ -34,20 +29,32 @@
 (defmulti mutate om/dispatch)
 
 (defmethod mutate 'hex/lay-tile
-  [{:keys [state] :as env} _ {:keys [pos tile orient]}]
+  [{:keys [state] :as env} _ {:keys [pos tile orient] :as props}]
     (if (not (nil? tile))
       {:action
        (fn [] (js/game_cmd_send (string/join ":" ["lay-tile" pos tile orient]))
-              (swap! state assoc-in [:tile/by-pos pos] {:pos pos :tile tile :orient orient}))}))
+              (swap! state update-in [:tile/by-pos pos] merge props))}))
+
+(defmethod mutate 'hex/lay-token
+  [{:keys [state] :as env} _ {:keys [pos station operating]}]
+   {:action
+       (fn [] (js/game_cmd_send (string/join ":" ["lay-token" pos station (:selected operating)]))
+              (swap! state update-in [:tile/by-pos pos :station station] conj (:selected operating) ))})
 
 (defmethod mutate 'draw/edit-done
-  [{:keys [state] :as env} _ {:keys [pos tile orient]}]
-  {:value {:keys [[:ephemeral :draw :drawing]]}
+  [{:keys [state] :as env} _ _]
+  {:value {:keys [[:ephemeral/draw :drawing]]}
    :action
-    (fn [] (swap! state assoc-in [:ephemeral :draw] {:in [] :last nil :drawing false}))})
+    (fn [] (swap! state assoc-in [:ephemeral/draw] {:in [] :last nil :drawing false}))})
 
 (defmethod mutate 'draw/edit-edge
   [{:keys [state] :as env} _ {:keys [this props in]}]
-  {:value {:keys [[:ephemeral :draw :drawing]]}
+  {:value {:keys [[:ephemeral/draw]]}
    :action
-    (fn [] (swap! state assoc-in [:ephemeral :draw] {:in in :last [this props] :drawing true}))})
+    (fn [] (swap! state assoc-in [:ephemeral/draw] {:in in :last [this props] :drawing true}))})
+
+(defmethod mutate 'company/select
+  [{:keys [state] :as env} _ {:keys [select] :as prop}]
+  {:value {:keys [:ephemeral/operating]}
+   :action
+    (fn [] (swap! state assoc-in [:ephemeral/operating] {:selected select}))})
