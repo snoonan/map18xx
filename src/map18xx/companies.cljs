@@ -2,7 +2,7 @@
   (:require [om.next :as om :refer-macros [defui]]
             [om.dom :as dom]
             [cljsjs.react]
-            [map18xx.map1820 :as board]
+            [map18xx.map18io :as board]
             [map18xx.utils :as utils]
             ))
 

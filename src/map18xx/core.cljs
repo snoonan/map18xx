@@ -13,6 +13,7 @@
             [map18xx.upg :as upg]
             ))
 
+(upg/add-tiles board/track-list)
 
 (defui MapView
        static om/IQuery
@@ -35,11 +36,11 @@
                                     [maxx maxy] %1]
                                    [(max x maxx) (max y maxy)]
                                     ) [0 0] tiles)]
-                (dom/div nil
+                (dom/div #js {:style #js {:display "flex"} }
+                 (companies/company-edit-view {:company-list companies :ephemeral/operating { :selected (-> this om/props :ephemeral/operating :selected) }} this)
                  (dom/svg #js {:width (* (+ mx 8) width scale) :height (* (+ my 8) height scale)}
                   (apply dom/g #js {:transform (str "scale("scale")")}
                    (conj (mapv tiles/tile-view tiles) edit-select )))
-                 (companies/company-edit-view {:company-list companies :ephemeral/operating { :selected (-> this om/props :ephemeral/operating :selected) }} this)
                  ))))
 
 (def reconciler

@@ -11,14 +11,16 @@
   <path   id="straightc" d="M 0 -.86 L 0 .83" ></path>
   <path   id="center"   d="M 0 -.86 L 0 0" ></path>
   <path   id="sharp"    d="M 0 -.86 A .5 .5 0 0 0 .75 -.43" fill="none"></path>
-  <path   id="gentleb"   d="M 0.09 -.347 A 1.5 1.5 0 0 0 .35 .104" fill="none" stroke="white" stroke-width="0.12"></path>
-  <path   id="gentlec"   d="M 0 -.86 A 1.5 1.5 0 0 0 .75 .43" fill="none"></path>
+  <path   id="gentleb"  d="M 0.09 -.347 A 1.5 1.5 0 0 0 .35 .104" fill="none" stroke="white" stroke-width="0.12"></path>
+  <path   id="gentlec"  d="M 0 -.86 A 1.5 1.5 0 0 0 .75 .43" fill="none"></path>
   <circle id="city"     r=".25" fill="currentColor" stroke="black" stroke-width="0.02"/>
   <circle id="dit"      r=".15" fill="currentColor" stroke="black" stroke-width="0.02"/>
   <path   id="offboard" d="M -0.15 -.86 l 0.3 0 l -0.15 .26 z" fill="black" stroke-width="0.01"></path>
   <path   id="water"    d="M -.75 0 Q -.5 -.25 -.25 0 Q 0 .25 .25 0 Q .5 -.25 .75 0" stroke="black" stroke-width="0.05" fill="none"/>
   <path   id="mountain" d="M -.33 .33 L 0 -.33 L .33 .33 z" stroke="black" stroke-width="0.05" fill="none"/>
-  <path   id="tributary" d="M -1 0 L -.5 .86" stroke="blue" stroke-width="0.18" fill="none"/>
+  <path   id="tributary" d="M .5 0 L -.5 0" stroke="blue" stroke-width="0.18" fill="none"/>
+  <path   id="tributaryr" d="M -.433 -.25 L .433 .25" stroke="blue" stroke-width="0.18" fill="none"/>
+  <path   id="anchor"   d="M -.03 0 L .03 0 M 0 -.07 L 0 .07 M .01 -.07 A .01 .01 0 0 0 -.01 -.07 M -.05 .04 A .05 .05 0 0 0 .05 .04" stroke="black" stroke-width="0.02" fill="none"/>
   <!-- terrain -->
   <g id="btarget">
         <use xlink:href="#target"/>
@@ -32,14 +34,41 @@
         <use xlink:href="#gentleb"/>
         <use xlink:href="#gentlec"/>
   </g>
-  <g id="tmountain">
+  <g id="tmountain2" transform="scale(0.5)">
         <use xlink:href="#mountain"/>
   </g>
-  <g id="twater">
+  <g id="twater2" transform="scale(0.5)">
         <use xlink:href="#water"/>
   </g>
-  <g id="ttributary">
+  <g id="ttributary0">
         <use xlink:href="#tributary"/>
+  </g>
+  <g id="ttributary1" transform="rotate(60)">
+        <use xlink:href="#tributary"/>
+  </g>
+  <g id="ttributary2" transform="rotate(120)">
+        <use xlink:href="#tributary"/>
+  </g>
+  <g id="ttributary0r">
+        <use xlink:href="#tributaryr"/>
+  </g>
+  <g id="ttributary1r" transform="rotate(60)">
+        <use xlink:href="#tributaryr"/>
+  </g>
+  <g id="ttributary2r" transform="rotate(120)">
+        <use xlink:href="#tributaryr"/>
+  </g>
+  <g id="pinkanchor">
+        <circle r=".15" fill="pink" stroke="black" stroke-width="0.05"/>
+        <use xlink:href="#anchor"/>
+  </g>
+  <g id="whiteanchor">
+        <circle r=".15" fill="white" stroke="black" stroke-width="0.05"/>
+        <use xlink:href="#anchor"/>
+  </g>
+  <g id="greenanchor">
+        <circle r=".15" fill="lightgreen" stroke="black" stroke-width="0.05"/>
+        <use xlink:href="#anchor"/>
   </g>
   <!-- yellow -->
   <g id="t7">

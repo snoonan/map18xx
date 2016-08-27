@@ -2,14 +2,30 @@
   (:require [om.next :as om :refer-macros [defui]]
             [om.dom :as dom]
             [cljsjs.react]
+            [clojure.string :as string]
             [map18xx.upg :as upg]
-            [map18xx.map1820 :as board]
             [map18xx.utils :as utils]
             ))
 
 (def draw-state (atom {}))
 
 (declare draw-tile)
+
+;; negative colors are spaced by two so no upgrades are possible
+(def hex-colors {0 "white"
+                 1 "yellow"
+                 2 "green"
+                 3 "brown"
+                 4 "lightgrey"
+                 -2 "grey"
+                 -4 "red"
+                 -6 "blue"})
+
+(defn- pos-in-hex
+  [pos]
+  (let [[r c] (utils/pos-to-rc pos) ]
+    [(- (* .125  c) 1.125)
+     (- (* .2165 r) .866)]))
 
 ; Because react.dom does not have an entry for 'use' so create one here.
 (def dom-use (js/React.createFactory "use"))
@@ -38,11 +54,12 @@
 (defn insert-tile-direct
   "Add a path to a tile."
   [[this pos-entry] e1 e2]
-  (if (not (= e1 e2))
-      (let [upgrade (upgrade-to pos-entry [e1 e2])]
+  (if (and (not (= e1 e2)) (nil? (pos-entry :color)))
+      (let [upgrade (upgrade-to pos-entry [e1 e2])
+            ]
         (if (not= (:tile pos-entry) (:tile upgrade))
           (do
-            (om/transact! this `[(hex/lay-tile ~(merge upgrade {:overlay [[]]}))])
+            (om/transact! this `[(hex/lay-tile ~(merge upgrade {:overlay {}}))])
             true)
         false))))
 
@@ -71,7 +88,7 @@
   [pos-entry pos this]
     (if (:drawing @draw-state)
       (let [lastpos ((:in @draw-state) 1)
-               direction (utils/find-direction lastpos pos (:rotate board/app-state))
+               direction (utils/find-direction lastpos pos (:rotate @(om/app-state (om/get-reconciler this))))
                newdraw {:in [((:in @draw-state) 1) pos] :from direction :last [this pos-entry] :drawing true}
                ]
            (do
@@ -110,12 +127,12 @@
     static om/Ident
     (ident [this {:keys [pos]}] [:tile/by-pos pos])
     static om/IQuery
-    (query [this] '[:pos :tile :orient :stations :overlay :label :color])
+    (query [this] '[:pos :tile :orient :stations :overlay-punch :overlay :label :color])
     Object
     (render [this]
     (let [{:keys [tile pos orient] :as props} (om/props this)
           [row col] (utils/pos-to-rc pos)
-          rotate  (:rotate board/app-state)
+          rotate  (:rotate @(om/app-state (om/get-reconciler this)))
           width (if (= rotate 30) 0.86 1.5)
           height (if (= rotate 30) 1.5 0.86)
           ]
@@ -133,18 +150,28 @@
                       (fn [e] (hex-edit props pos this))
                   }
         (-> '()
-        (into (if (contains? props :overlay)
-          (map (fn [[tile orient]] (let [rotate (if orient orient -0.5) ]
-                 (dom-use #js {:xlinkHref (str "defs.svg#" tile)
-                               :transform (str "rotate(" (* rotate 60) ")")}))) (:overlay props)) '()))
-        (into (if (contains? props :label)
-          (list (dom/text #js {:x (get-in props [:label 0 0])
-                         :y (get-in props [:label 0 1])
-                         :fontSize 16 :textAnchor "middle"
-                         :fill "white"
-                         :transform (str "scale(0.02) rotate(-" rotate ")")} (get-in props [:label 1]))) '()))
-        (conj 
-                (draw-tile this props)))))))
+        (into (map (fn [[loc sym]]
+                 (dom-use #js {:xlinkHref (str "defs.svg#" sym)
+                               :transform (str "translate(" ((pos-in-hex loc) 0) ","
+                                                            ((pos-in-hex loc) 1) ")" "
+                                                rotate(-" rotate ")")
+                               }))
+                 (:overlay props)))
+        (into (map (fn [[loc sym]]
+                 (dom-use #js {:xlinkHref (str "defs.svg#" sym)
+                               :transform (str "translate(" ((pos-in-hex loc) 0) ","
+                                                            ((pos-in-hex loc) 1) ")" "
+                                                rotate(-" rotate ")")
+                               }))
+                 (:overlay-punch props)))
+        (into (map (fn [[loc text]]
+                 (dom/text #js {:x (* 50 ((pos-in-hex loc) 0))
+                                :y (* 50 ((pos-in-hex loc) 1))
+                                :fontSize 16 :textAnchor "middle"
+                                :fill "black"
+                                :transform (str "scale(0.02) rotate(-" rotate ")")} text))
+               (:label props)))
+        (conj (draw-tile this props rotate)))))))
 
 (def tile-view (om/factory TileView {:keyfn :pos}))
 
@@ -159,7 +186,7 @@
           {:keys [in last drawing]} (if (nil? in) (get-in (om/props this) [:ephemeral/draw]) {:in in :last last :drawing drawing})
           [to-edit {:keys [pos tile] :as props}] last
           [row col] (utils/pos-to-rc pos)
-          rotate  (:rotate board/app-state)
+          rotate  (:rotate @(om/app-state (om/get-reconciler this)))
           width (if (= rotate 30) 0.86 1.5)
           height (if (= rotate 30) 1.5 0.86)
           ]
@@ -168,7 +195,7 @@
                               "rotate(" rotate ") scale(1.5)")
                       :id "upgrade-select" }
              (-> [(dom-use #js {:xlinkHref (str "defs.svg#hex")
-                                  :transform (str "rotate(0)")
+                                :transform (str "rotate(0)")
                                 :fill "blue" :opacity "0.1"
                                 :onClick (fn [e] (hex-hide-edit this))})]
                  (into (if (= "t500" tile)
@@ -193,102 +220,68 @@
 
 (def tile-edit-view (om/factory TileEditView {:keyfn :drawing}))
 
-;; negative colors are spaced by two so no upgrades are possible
-(def hex-colors {0 "white"
-                 1 "yellow"
-                 2 "green"
-                 3 "brown"
-                 4 "lightgrey"
-                 -2 "grey"
-                 -4 "red"
-                 -6 "blue"})
-
-;; points in a hex with a unit side centered around the origin
-(def hex-points {0   [ 0     -0.866]
-                 1   [ 0.750 -0.443]
-                 2   [ 0.750  0.443]
-                 3   [ 0      0.866]
-                 4   [-0.750  0.443]
-                 5   [-0.750 -0.443]
-                 "A" [ 0      0]
-                 "B" [ 0     -0.216]
-                 "C" [ 0.125 -0.216]
-                 "D" [ 0.188 -0.108]
-                 "E" [ 0.250  0]
-                 "F" [ 0.188  0.108]
-                 "G" [ 0.125  0.216]
-                 "H" [ 0      0.216]
-                 "I" [-0.125  0.216]
-                 "J" [-0.188  0.108]
-                 "K" [-0.250  0]
-                 "L" [-0.188 -0.108]
-                 "M" [-0.125 -0.216]
-                 "N" [ 0     -0.443]
-                 "Z" [ 0.250 -0.443]
-                 "P" [ 0.375 -0.222]
-                 "Q" [ 0.500  0]
-                 "R" [ 0.375  0.222]
-                 "S" [ 0.250  0.443]
-                 "T" [ 0      0.443]
-                 "U" [-0.250  0.443]
-                 "V" [-0.375  0.222]
-                 "W" [-0.500  0]
-                 "X" [-0.375 -0.222]
-                 "Y" [-0.250 -0.443]
-                 })
-
 (defn draw-tile
   [this {:keys [pos tile orient color] :as props}]
-  (let [tile-info (board/track-list tile)
+  (let [tile-info (@upg/track-list tile)
         color (or color (hex-colors (get tile-info "p."))) ]
 (apply dom/g #js { :transform (str "rotate(" (* orient 60) ")") }
     (reduce
-          (fn [a [[op location] v]]
-            (let [location-real (or (tile-info (str "a" location)) location)
-                  stations (or (tile-info (str "r" location)) location-real) ]
+          (fn [a [k v]]
+            (let [op (first k)
+                  location (string/join "" (rest k))
+                  location-real (or (tile-info (str "a" location)) [location])
+                  stations (or (tile-info (str "r" location)) location-real)
+                  ]
              (-> a
-              (into (if (sequential? v)
-                      (for [track-set (if (sequential? (first v)) v (if (= 2 (count v)) [v] (map (fn [x] [location-real x]) v)))]
+              (into (if (and (upg/substring? op ".cd") (sequential? v))
+                      (for [track-set (if (sequential? (first v)) v (if (= 2 (count v)) [v] (map (fn [x] [(first location-real) x]) v)))]
                         (let [[e1 e2] track-set]
                           (if-not (and (number? e1) (number? e2))
-                            (dom/path #js {:d (str "M" ((get hex-points e1) 0) " "
-                                                       ((get hex-points e1) 1)
-                                                   "L" ((get hex-points e2) 0) " "
-                                                       ((get hex-points e2) 1))
+                            (dom/path #js {:d (str "M" ((pos-in-hex e1) 0) " "
+                                                       ((pos-in-hex e1) 1)
+                                                   "L" ((pos-in-hex e2) 0) " "
+                                                       ((pos-in-hex e2) 1))
                                            :stroke "black" :strokeWidth 0.1})
                             (case (- e2 e1)
                               1 (dom-use #js {:xlinkHref "defs.svg#sharp"
-                                           :transform (str "rotate(" (* e1 60) ")")})
+                                              :transform (str "rotate(" (* e1 60) ")")})
                               2 (dom-use #js {:xlinkHref "defs.svg#gentle"
-                                           :transform (str "rotate(" (* e1 60) ")")})
+                                              :transform (str "rotate(" (* e1 60) ")")})
                               3 (dom-use #js {:xlinkHref "defs.svg#straight"
-                                           :transform (str "rotate(" (* e1 60) ")")})
+                                              :transform (str "rotate(" (* e1 60) ")")})
                               4 (dom-use #js {:xlinkHref "defs.svg#gentle"
-                                           :transform (str "rotate(" (* e2 60) ")")})
+                                              :transform (str "rotate(" (* e2 60) ")")})
                               5 (dom-use #js {:xlinkHref "defs.svg#sharp"
-                                           :transform (str "rotate(" (* e2 60) ")")}))))
+                                              :transform (str "rotate(" (* e2 60) ")")}))))
                                        ) [] ))
               (into (case op
                 "c" (into
                       (map (fn [loc co]
-                       (dom-use (clj->js (merge {:xlinkHref "defs.svg#city"
-                                     :transform (str "translate(" ((get hex-points loc) 0)","((get hex-points loc) 1) ")") }
-                                     (if co
-                                       {:color co}
-                                       {:color "white"
-                                        :onClick (fn [e] (.stopPropagation e) (token-city this pos location)) })
-                                     )))) stations (into (vec (get-in props [:station location])) (repeat (count stations) nil)))
+                              (dom-use (clj->js (merge {:xlinkHref "defs.svg#city"
+                                                        :transform (str "translate(" ((pos-in-hex loc) 0) "," ((pos-in-hex loc) 1) ")") }
+                                               (if co
+                                                 {:color co}
+                                                 {:color "white"
+                                                  :onClick (fn [e] (.stopPropagation e) (token-city this pos location))})))))
+                           stations
+                           (into (vec (get-in props [:station location])) (repeat (count stations) nil)))
                       (for [loc1 stations loc2 stations]
-                       (dom/path #js {:d (str "M" ((get hex-points loc1) 0) " "
-                                                  ((get hex-points loc1) 1) " "
-                                              "L" ((get hex-points loc2) 0) " "
-                                                  ((get hex-points loc2) 1))
-                                      :stroke "white"
-                                      :strokeWidth 0.5})))
+                        (dom/path #js {:d (str "M" ((pos-in-hex loc1) 0) " "
+                                                   ((pos-in-hex loc1) 1)
+                                               "L" ((pos-in-hex loc2) 0) " "
+                                                   ((pos-in-hex loc2) 1))
+                                       :stroke "white"
+                                       :strokeWidth 0.5})))
                 "d" (for [loc stations]
                        (dom-use #js {:xlinkHref "defs.svg#dit"
-                                     :transform (str "translate(" ((get hex-points loc) 0)","((get hex-points loc) 1) ")")}))
-                "l" [(dom/text #js {:x (* 50 ((get hex-points location) 0)) :y (* 50 ((get hex-points location) 1))
+                                     :transform (str "translate(" ((pos-in-hex loc) 0) "," ((pos-in-hex loc) 1) ")") }))
+                "t" [(dom/text #js {:x (* 50 ((pos-in-hex (second v)) 0))
+                                    :y (* 50 ((pos-in-hex (second v)) 1))
+                                    :fontSize 16 :textAnchor "middle"
+                                    :fill "black"
+                                    :transform "scale(.02)"} (first v))]
+                "l" [(dom/text #js {:x (* 50 ((pos-in-hex location) 0))
+                                    :y (* 50 ((pos-in-hex location) 1))
                                     :fontSize 16 :textAnchor "middle"
                                     :fill "black"
                                     :transform "scale(.02)"} v)]

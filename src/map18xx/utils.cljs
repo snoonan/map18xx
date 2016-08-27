@@ -1,11 +1,14 @@
 (ns map18xx.utils)
 
+(def edges [[0 9] [2 15] [6 15] [8 9] [6 3] [2 3]])
+
 (defn pos-to-rc
  "Translate L## into (y x)"
  [pos]
+ (if (number? pos) (edges pos)
  (if-let [[row & col] pos]
  [(- (.charCodeAt row 0) 97) (reduce #(+ (* %1 10) (int %2)) col) ]
- [-2 -2]))
+ [-2 -2])))
 
 (defn find-direction
   "Find the edge number in the target hex when coming from the 'from' hex"
