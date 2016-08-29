@@ -4,7 +4,7 @@
             [om.dom :as dom]
             [clojure.string :as string]
             [clojure.walk :as walk]
-            [map18xx.map1820 :as board]
+            [map18xx.map18io :as board]
             [map18xx.companies :as companies]
             [map18xx.tiles :as tiles]
             [map18xx.parser :as p]
@@ -14,6 +14,7 @@
             ))
 
 (upg/add-tiles board/track-list)
+(tiles/add-transform-track board/transform-track)
 
 (defui MapView
        static om/IQuery

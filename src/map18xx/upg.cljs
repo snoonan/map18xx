@@ -2,9 +2,18 @@
   (:require [clojure.string :as string]
             [map18xx.tileset :as tileset]))
 
-(def track-list (atom tileset/track-list))
+(def track-list (atom {}))
 
-(defn add-tiles [new-tiles] (swap! track-list merge new-tiles))
+(defn tilelist [new-tiles]
+  (reduce (fn [a [k v]]
+            (assoc a k (if (contains? v "from")
+                         (merge (tileset/track-list (v "from")) v)
+                         (if (contains? tileset/track-list k)
+                           (merge (tileset/track-list k) v)
+                           v))))
+           {} new-tiles))
+
+(defn add-tiles [new-tiles] (swap! track-list merge (tilelist new-tiles)))
 
 ; From SO
 (defn- substring? [sub st]
@@ -105,8 +114,18 @@
         new-merge-keys (filter #(substring? (first %) "m") (keys new-spec))
         new-city-keys (filter #(substring? (first %) "c") (keys new-spec))
         org-city-keys (filter #(substring? (first %) "c") (keys org-spec))
-        new-rotated  (reduce #(assoc %1 (second %2) (rotate-set new-orient (new-spec %2))) {} new-city-keys)
-        org-rotated  (reduce #(assoc %1 (second %2) (rotate-set orient (org-spec %2))) {} org-city-keys)
-        merge-keys (merge (select-keys new-spec new-merge-keys) (reduce (fn [a [k v]] (merge a {k (some #(if (in-lists v [(second %)]) (first %)) new-rotated)})) {} org-rotated))
+        new-rotated  (reduce #(assoc %1 (subs %2 1)
+                                     (rotate-set new-orient (new-spec %2)))
+                             {} new-city-keys)
+        org-rotated  (reduce #(assoc %1 (subs %2 1)
+                                     (rotate-set orient (org-spec %2)))
+                             {} org-city-keys)
+        merge-keys (merge (select-keys new-spec new-merge-keys)
+                          (reduce (fn [a [k v]]
+                                    (merge a {k
+                                            (some #(if (in-lists v [(second %)])
+                                                     (first %))
+                                                  new-rotated)}))
+                                  {} org-rotated))
         ]
     [merge-keys {:orient new-orient :tile new-tile}]))

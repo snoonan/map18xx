@@ -9,6 +9,10 @@
 
 (def draw-state (atom {}))
 
+(def transform-track (atom {}))
+
+(defn add-transform-track [xs] (swap! transform-track merge xs))
+
 (declare draw-tile)
 
 ;; negative colors are spaced by two so no upgrades are possible
@@ -29,6 +33,7 @@
 
 ; Because react.dom does not have an entry for 'use' so create one here.
 (def dom-use (js/React.createFactory "use"))
+(def dom-textpath (js/React.createFactory "textpath"))
 
 (defn intersect-track
   [tile edges upgrademaps]
@@ -42,19 +47,17 @@
 (defn upgrade-to
   "Determine tile and orient to upgrade a tile to when adding a path from e1 to e2."
   [{ :keys [pos tile orient] :as props} edges]
-  (let [ real (vec (filter #(not (nil? %)) edges))
-        [merge-list new-props] (upg/upgrade tile orient real)
-        ]
+  (let [ real (vec (keep identity edges))
+        [merge-list new-props] (upg/upgrade tile orient real)]
       (-> props
-        (merge (if (:tile new-props)
-          new-props))
+        (merge (if (:tile new-props) new-props))
         (assoc :station
                (reduce (fn [a [k v]] (update a (get merge-list k k) conj v)) {} (:station props))))))
 
 (defn insert-tile-direct
   "Add a path to a tile."
   [[this pos-entry] e1 e2]
-  (if (and (not (= e1 e2)) (nil? (pos-entry :color)))
+  (if (nil? (pos-entry :color))
       (let [upgrade (upgrade-to pos-entry [e1 e2])
             ]
         (if (not= (:tile pos-entry) (:tile upgrade))
@@ -105,14 +108,11 @@
   [this]
      (om/transact! (om/get-reconciler this) `[(draw/edit-done)]))
 
-(defn hex-edit
-  [props pos this]
-     (om/transact! (om/get-reconciler this) `[(draw/edit-edge ~{:this this :props props :in []})]))
-
 (defn hex-edge
   [ this to-edit props in pos ]
       (let [in' (if (keyword? pos) (remove keyword? in) in)
             in (if (some #{pos} in) (remove #{pos} in) (conj in' pos))
+            in (keep identity in)
             edges (remove keyword? in)
             new-tile (some #(if (keyword? %) %) in)
             tile (if new-tile (name new-tile) (:tile props))
@@ -122,6 +122,11 @@
         (if insert
          (om/transact! this '[(draw/edit-done)])
          (om/transact! this `[(draw/edit-edge ~{:this to-edit :props props :in in})]))))
+
+(defn hex-edit
+  [props pos this]
+  (hex-edge (om/get-reconciler this) this props [] nil))
+  ;(om/transact! (om/get-reconciler this) `[(draw/edit-edge ~{:this this :props props :in []})]))
 
 (defui TileView
     static om/Ident
@@ -164,12 +169,25 @@
                                                 rotate(-" rotate ")")
                                }))
                  (:overlay-punch props)))
-        (into (map (fn [[loc text]]
-                 (dom/text #js {:x (* 50 ((pos-in-hex loc) 0))
-                                :y (* 50 ((pos-in-hex loc) 1))
-                                :fontSize 16 :textAnchor "middle"
-                                :fill "black"
-                                :transform (str "scale(0.02) rotate(-" rotate ")")} text))
+        (into (map (fn [[[loc-start loc-end bg-color fg-color] text]]
+                     (let [[x-start y-start] (map (partial * 50) (pos-in-hex loc-start))
+                           [x-end y-end] (map (partial * 50) (pos-in-hex loc-end))
+                           fg-color (or fg-color "black")
+                           bg-color (or bg-color "white")
+                           ]
+                       (dom/g #js { :transform "scale(0.02)"}
+                          (dom/path #js {:id (str pos loc-start)
+                                         :stroke bg-color :strokeWidth 15
+                                         :d (str "M"x-start" "y-start"L"x-end" "y-end) })
+                          (dom/text #js {:fill fg-color
+                                         :dangerouslySetInnerHTML
+                                         #js {:__html
+                                              (str "<textPath xlink:href='#"(str pos loc-start)"' textLength='"(- x-end x-start)"' lengthAdjust='spacingAndGlyphs'>"text"</textPath>")}}
+                                   (comment "Does not render correctly" (dom-textpath #js {:xlinkHref (str "#" pos loc-start)
+                                                       :textLength (- x-end x-start)    ;; to a first aproximation
+                                                       :lengthAdjust "spacingAndGlyphs" }
+                                                  text))
+                                   ))))
                (:label props)))
         (conj (draw-tile this props rotate)))))))
 
@@ -193,24 +211,18 @@
        (if drawing
          (apply dom/g #js { :transform (str "translate(" (+ 4 (* width col)) "," (+ 4 (* height row)) ") "
                               "rotate(" rotate ") scale(1.5)")
-                      :id "upgrade-select" }
+                            :id "upgrade-select" }
              (-> [(dom-use #js {:xlinkHref (str "defs.svg#hex")
                                 :transform (str "rotate(0)")
                                 :fill "blue" :opacity "0.1"
                                 :onClick (fn [e] (hex-hide-edit this))})]
-                 (into (if (= "t500" tile)
-                        [(dom-use #js {:xlinkHref (str "defs.svg#target")
-                                       :transform (str "translate(0.25,0)")
-                                       :color (if (= in (filter #(not (= :t503 %)) in)) "white" "green")
-                                       :onClick (fn [e] (hex-edge this to-edit props in :t503))})
-                         (dom-use #js {:xlinkHref (str "defs.svg#btarget")
-                                       :transform (str "translate(-0.125,-0.216)")
-                                       :color (if (= in (filter #(not (= :tbig %)) in)) "white" "green")
-                                       :onClick (fn [e] (hex-edge this to-edit props in :tbig))})
-                         (dom-use #js {:xlinkHref (str "defs.svg#dit")
-                                       :transform (str "translate(-0.125,0.216)")
-                                       :color (if (= in (filter #(not (= :t501 %)) in)) "black" "green")
-                                       :onClick (fn [e] (hex-edge this to-edit props in :t501))})]
+                 (into (if (contains? @transform-track tile)
+                         (map (fn [[new-base [loc sym fill]]]
+                                (dom-use #js {:xlinkHref (str "defs.svg#" sym)
+                                              :transform (str "translate(" ((pos-in-hex loc) 0) "," ((pos-in-hex loc) 1) ")")
+                                              :color (if (= in (filter #(not (= (keyword new-base) %)) in)) (or fill "white") "green")
+                                              :onClick (fn [e] (hex-edge this to-edit props in (keyword new-base)))}))
+                                (@transform-track tile))
                          []))
                  (into (for [orient [0 1 2 3 4 5]]
                    (dom-use #js {:xlinkHref (str "defs.svg#target")
