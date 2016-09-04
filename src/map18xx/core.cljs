@@ -4,7 +4,7 @@
             [om.dom :as dom]
             [clojure.string :as string]
             [clojure.walk :as walk]
-            [map18xx.map18io :as board]
+            [map18xx.map1820 :as board]
             [map18xx.companies :as companies]
             [map18xx.tiles :as tiles]
             [map18xx.parser :as p]
@@ -13,40 +13,48 @@
             [map18xx.upg :as upg]
             ))
 
-(upg/add-tiles board/track-list)
-(tiles/add-transform-track board/transform-track)
-
 (defui MapView
        static om/IQuery
        (query [this]
               [{:tiles (om/get-query tiles/TileView)}
                {:companies [:name :color]}
-               {:ephemeral/draw (om/get-query tiles/TileEditView)}
+               {:inventory (om/get-query tiles/TileSetView)}
+               ;(om/get-query tiles/TileEditView)
+               :ephemeral/draw :transform-track
                {:ephemeral/operating [:selected]}])
        Object
        (render [this]
                (let [scale 30
                      tiles (-> this om/props :tiles)
                      companies (-> this om/props :companies)
+                     tile-set (-> this om/props :inventory)
                      rotate  (:rotate board/app-state)
                      width (if (= rotate 30) 0.86 1.5)
                      height (if (= rotate 30) 1.5 0.86)
-                     edit-select (tiles/tile-edit-view (-> this om/props :ephemeral/draw))
+                     edit-select (tiles/tile-edit-view
+                                   {
+                                    :ephemeral/draw (-> this om/props :ephemeral/draw)
+                                    :transform-track (-> this om/props :transform-track)
+                                    })
                      [mx my] (reduce #(
                                let [[y x] (utils/pos-to-rc (:pos %2))
                                     [maxx maxy] %1]
                                    [(max x maxx) (max y maxy)]
                                     ) [0 0] tiles)]
                 (dom/div #js {:style #js {:display "flex"} }
-                 (companies/company-edit-view {:company-list companies :ephemeral/operating { :selected (-> this om/props :ephemeral/operating :selected) }} this)
-                 (dom/svg #js {:width (* (+ mx 8) width scale) :height (* (+ my 8) height scale)}
+                 (dom/div #js {:style #js {:display "flex" :flex-direction "column"} }
+                   (companies/company-edit-view {:company-list companies :ephemeral/operating { :selected (-> this om/props :ephemeral/operating :selected) }} this)
+                   (dom/div #js {:style #js {:display "flex" :flexWrap "wrap"} }
+                            (mapv tiles/tile-set-view tile-set))
+                 )
+                 (dom/svg #js {:width (* (+ mx 8) width scale) :height (* (+ my 8) height scale) :overflow "scroll"}
                   (apply dom/g #js {:transform (str "scale("scale")")}
                    (conj (mapv tiles/tile-view tiles) edit-select )))
                  ))))
 
 (def reconciler
   (om/reconciler
-    {:state board/app-state
+    {:state (assoc board/app-state :inventory (upg/add-tiles board/track-list))
      :parser (om/parser {:read p/read :mutate p/mutate})}))
 
 (om/add-root! reconciler

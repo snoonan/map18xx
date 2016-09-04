@@ -9,11 +9,17 @@
 
 (def draw-state (atom {}))
 
-(def transform-track (atom {}))
-
-(defn add-transform-track [xs] (swap! transform-track merge xs))
-
 (declare draw-tile)
+
+(defn lay-tile
+  [state {:keys [pos tile] :as new-props}]
+  (let [new-count (get-in state [:tileinv/by-tile tile :remaining])]
+  (if (or (< 0 new-count) (nil? new-count))
+    (-> state
+        (update-in [:tile/by-pos pos] merge new-props)
+        (update-in [:tileinv/by-tile tile :remaining] #(if (nil? %) % (dec %)))
+        (update-in [:tileinv/by-tile (get-in state [:tile/by-pos pos :tile]) :remaining] #(if (nil? %) nil (inc %)))
+        ))))
 
 ;; negative colors are spaced by two so no upgrades are possible
 (def hex-colors {0 "white"
@@ -195,13 +201,12 @@
 
 (defui TileEditView
     static om/IQuery
-    (query [this] '[:ephemeral/draw])
+    (query [this] [:ephemeral/draw :transform-track])
     Object
     (render [this]
     (let [
-          ; HELP! something is going on here that I don't understand. sometimes it is the value sometimes it is a tree that contains.
-          {:keys [in last drawing]} (om/props this)
-          {:keys [in last drawing]} (if (nil? in) (get-in (om/props this) [:ephemeral/draw]) {:in in :last last :drawing drawing})
+          {:keys [in last drawing]} (get-in (om/props this) [:ephemeral/draw])
+          transform-track (get-in (om/props this) [:transform-track])
           [to-edit {:keys [pos tile] :as props}] last
           [row col] (utils/pos-to-rc pos)
           rotate  (:rotate @(om/app-state (om/get-reconciler this)))
@@ -216,13 +221,13 @@
                                 :transform (str "rotate(0)")
                                 :fill "blue" :opacity "0.1"
                                 :onClick (fn [e] (hex-hide-edit this))})]
-                 (into (if (contains? @transform-track tile)
+                 (into (if (contains? transform-track tile)
                          (map (fn [[new-base [loc sym fill]]]
                                 (dom-use #js {:xlinkHref (str "defs.svg#" sym)
                                               :transform (str "translate(" ((pos-in-hex loc) 0) "," ((pos-in-hex loc) 1) ")")
                                               :color (if (= in (filter #(not (= (keyword new-base) %)) in)) (or fill "white") "green")
                                               :onClick (fn [e] (hex-edge this to-edit props in (keyword new-base)))}))
-                                (@transform-track tile))
+                                (transform-track tile))
                          []))
                  (into (for [orient [0 1 2 3 4 5]]
                    (dom-use #js {:xlinkHref (str "defs.svg#target")
@@ -231,6 +236,33 @@
                                  :onClick (fn [e] (hex-edge this to-edit props in orient))})))))))))
 
 (def tile-edit-view (om/factory TileEditView {:keyfn :drawing}))
+
+
+(defui TileSetView
+    static om/Ident
+    (ident [this {:keys [tile]}] [:tileinv/by-tile tile])
+    static om/IQuery
+    (query [this] [:tile :remaining])
+    Object
+    (render [this]
+    (let [
+          {:keys [tile remaining] :as props} (om/props this)
+          rotate  (:rotate @(om/app-state (om/get-reconciler this)))
+          width (if (= rotate 30) 0.86 1.5)
+          height (if (= rotate 30) 1.5 0.86)
+          scale 30
+          ]
+      (dom/svg #js {:width (* 2.5 scale) :height (* 2 scale)}
+        (dom/g #js { :transform (str "translate(" scale "," scale ") scale(" scale ") rotate(" rotate ")") }
+          (draw-tile this props 0))
+          (dom/text #js {:x (* 2.1 scale)
+                              :y scale
+                              :fontSize 16 :textAnchor "middle"
+                              :fill "black" }
+                    remaining)
+          ))))
+
+(def tile-set-view (om/factory TileSetView {:keyfn :tile}))
 
 (defn draw-tile
   [this {:keys [pos tile orient color] :as props}]
@@ -271,10 +303,13 @@
                       (map (fn [loc co]
                               (dom-use (clj->js (merge {:xlinkHref "defs.svg#city"
                                                         :transform (str "translate(" ((pos-in-hex loc) 0) "," ((pos-in-hex loc) 1) ")") }
-                                               (if co
-                                                 {:color co}
-                                                 {:color "white"
-                                                  :onClick (fn [e] (.stopPropagation e) (token-city this pos location))})))))
+                                               (if pos
+                                                 (if co
+                                                   {:color co}
+                                                   {:color "white"
+                                                    :onClick (fn [e] (.stopPropagation e) (token-city this pos location))})
+                                                 {:color "white"}
+                                                 )))))
                            stations
                            (into (vec (get-in props [:station location])) (repeat (count stations) nil)))
                       (for [loc1 stations loc2 stations]

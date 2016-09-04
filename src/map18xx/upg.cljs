@@ -13,7 +13,12 @@
                            v))))
            {} new-tiles))
 
-(defn add-tiles [new-tiles] (swap! track-list merge (tilelist new-tiles)))
+(defn add-tiles [new-tiles]
+  (do
+    (swap! track-list merge (tilelist new-tiles))
+    (reduce (fn [a [k v]]
+              (if (contains? v "#.") (conj a {:tile k :remaining (v "#.")}) a))
+            [] @track-list)))
 
 ; From SO
 (defn- substring? [sub st]
