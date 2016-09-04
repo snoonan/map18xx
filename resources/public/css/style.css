@@ -2,3 +2,5 @@
 .right {text-align:right;}
 .selected {background-color:grey;}
 textpath {dominant-baseline: central;}
+svg {flex: 0 0 auto;}
+

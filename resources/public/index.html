@@ -13,6 +13,8 @@
   </head>
   <body>
   <div id="webrtc" hidden>
+      <button onclick="document.getElementById('webrtc_ui').hidden=false; document.getElementById('webrtc_enable').hidden=true" id="webrtc_enable">Share session</button>
+  <div id="webrtc_ui" hidden>
     Your PeerJS ID is <input type="text" id="pid" placeholder="random id"><input class="button" type="button" value="Connect" id="login"><br><br>
     Connect to a peer: <input type="text" id="rid" placeholder="Someone else's id"><input class="button" type="button" value="Connect" id="connect"><br><br>
 
@@ -22,6 +24,7 @@
     <button id="close">Close selected connections</button>
     <div id="wrap"><div id="connections"><span class="filler">You have not yet made any connections.</span></div>
     <div class="clear"></div></div>
+  </div>
   </div>
       <div id="tt"> </div>
   <style>use:not(.stripe) {stroke:black;stroke-width:.1}</style>
