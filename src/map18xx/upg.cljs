@@ -100,9 +100,7 @@
   (let [tile-options (all-up tile)]
     (filter #(not (empty? (second %)))
       (for [[rotation choices] tile-options]
-        (let [edges (rotate-set (- 6 (mod (+ orient rotation) 6)) edges)
-              org-edges (rotate-set (- 6 (mod + (orient rotation) 6))  )
-              ]
+        (let [edges (rotate-set (- 6 (mod (+ orient rotation) 6)) edges) ]
           [(mod (+ orient rotation) 6) (filter #(filter-as-any edges (get-edges (@track-list %))) choices)])))))
 
 (defn unique-path?
