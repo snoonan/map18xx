@@ -27,7 +27,15 @@
                (let [scale 30
                      tiles (-> this om/props :tiles)
                      companies (-> this om/props :companies)
-                     tile-set (-> this om/props :inventory)
+                     editting (-> this om/props :ephemeral/draw)
+                     full-tile-set (upg/tile-sort (-> this om/props :inventory))
+                     tile-set-list (if (:drawing editting)
+                                      (reduce (fn [a v] (into a (second v))) []
+                                        (upg/has-path (-> editting :last (get 1) :tile)
+                                                      (-> editting :last (get 1) :orient)
+                                                      (-> editting :in)))
+                                      (map #(% :tile) full-tile-set))
+                     tile-set (filter #(some (partial = (:tile %)) tile-set-list) full-tile-set)
                      rotate  (:rotate board/app-state)
                      width (if (= rotate 30) 0.86 1.5)
                      height (if (= rotate 30) 1.5 0.86)
@@ -42,7 +50,7 @@
                                    [(max x maxx) (max y maxy)]
                                     ) [0 0] tiles)]
                 (dom/div #js {:style #js {:display "flex"} }
-                 (dom/div #js {:style #js {:display "flex" :flex-direction "column"} }
+                 (dom/div #js {:style #js {:display "flex" :flexDirection "column"} }
                    (companies/company-edit-view {:company-list companies :ephemeral/operating { :selected (-> this om/props :ephemeral/operating :selected) }} this)
                    (dom/div #js {:style #js {:display "flex" :flexWrap "wrap"} }
                             (mapv tiles/tile-set-view tile-set))

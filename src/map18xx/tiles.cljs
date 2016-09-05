@@ -79,8 +79,9 @@
 
 (defn token-city
   [this pos station]
-  (om/transact! this `[(hex/lay-token ~{:pos pos :station station
-                                      :operating (:ephemeral/operating @(om/app-state (om/get-reconciler this)))})]))
+  (if (:ephemeral/operating @(om/app-state (om/get-reconciler this)))
+    (om/transact! this `[(hex/lay-token ~{:pos pos :station station
+                                          :operating (:ephemeral/operating @(om/app-state (om/get-reconciler this)))})])))
 
 (defn hex-down
   [pos-entry pos this]

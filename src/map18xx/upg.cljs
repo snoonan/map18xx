@@ -94,12 +94,15 @@
                       edge-lists)))
 
 
+
 (defn- has-path
   [tile orient edges]
   (let [tile-options (all-up tile)]
     (filter #(not (empty? (second %)))
       (for [[rotation choices] tile-options]
-        (let [edges (rotate-set (- 6 (mod (+ orient rotation) 6)) edges) ]
+        (let [edges (rotate-set (- 6 (mod (+ orient rotation) 6)) edges)
+              org-edges (rotate-set (- 6 (mod + (orient rotation) 6))  )
+              ]
           [(mod (+ orient rotation) 6) (filter #(filter-as-any edges (get-edges (@track-list %))) choices)])))))
 
 (defn unique-path?
@@ -134,3 +137,15 @@
                                   {} org-rotated))
         ]
     [merge-keys {:orient new-orient :tile new-tile}]))
+
+(defn tile-sort
+  [xs]
+  (sort (fn [a b]
+          (let [a-info (@track-list (:tile a))
+                b-info (@track-list (:tile b))
+                ]
+            (reduce #(if (= 0 %1) (%2) %1) 0
+                  [#(- (get a-info "p.") (get b-info "p." ))
+                   #(compare (get-in a-info ["t." 0]) (get-in b-info ["t." 0]))
+                   #(compare (:tile a) (:tile b))])))
+          xs))
