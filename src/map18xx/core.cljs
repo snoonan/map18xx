@@ -29,11 +29,14 @@
                      companies (-> this om/props :companies)
                      editting (-> this om/props :ephemeral/draw)
                      full-tile-set (upg/tile-sort (-> this om/props :inventory))
+                     new-tile (some #(if (keyword? %) %) (-> editting :in))
+                     edges (remove keyword? (-> editting :in))
+                     basetile (if new-tile (name new-tile) (-> editting :last (get 1) :tile))
                      tile-set-list (if (:drawing editting)
                                       (reduce (fn [a v] (into a (second v))) []
-                                        (upg/has-path (-> editting :last (get 1) :tile)
+                                        (upg/has-path basetile
                                                       (-> editting :last (get 1) :orient)
-                                                      (-> editting :in)))
+                                                      edges))
                                       (map #(% :tile) full-tile-set))
                      tile-set (filter #(some (partial = (:tile %)) tile-set-list) full-tile-set)
                      rotate  (:rotate board/app-state)

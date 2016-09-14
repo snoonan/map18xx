@@ -65,11 +65,10 @@
   "Add a path to a tile."
   [[this pos-entry] e1 e2]
   (if (nil? (pos-entry :color))
-      (let [upgrade (upgrade-to pos-entry [e1 e2])
-            ]
+      (let [upgrade (upgrade-to pos-entry [e1 e2])]
         (if (not= (:tile pos-entry) (:tile upgrade))
           (do
-            (om/transact! this `[(hex/lay-tile ~(merge upgrade {:overlay {}}))])
+            (om/transact! this `[(hex/lay-tile ~(merge upgrade {:overlay {}})) [:tileinv/by-tile ~(:tile pos-entry)] [:tileinv/by-tile ~(:tile upgrade)]])
             true)
         false))))
 
@@ -128,8 +127,8 @@
             insert (apply insert-tile-direct [to-edit new-props] edges)    ; No need to wrap as it will be wrapped later.
             ]
         (if insert
-         (om/transact! this '[(draw/edit-done)])
-         (om/transact! this `[(draw/edit-edge ~{:this to-edit :props props :in in})]))))
+         (om/transact! this '[(draw/edit-done) :ephemeral/draw])
+         (om/transact! this `[(draw/edit-edge ~{:this to-edit :props props :in in}) :ephemeral/draw]))))
 
 (defn hex-edit
   [props pos this]
