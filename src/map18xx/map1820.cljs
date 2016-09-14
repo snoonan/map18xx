@@ -52,13 +52,16 @@
                         { :pos "b12" :tile "t500" :orient 0 :overlay {"g11" "tmountain2"} }
                         { :pos "b14" :tile "t500" :orient 0 }
                         { :pos "b16" :tile "t500" :orient 0 }
-                        { :pos "c3"  :tile "t506" :orient 1 :label {["f2" "b14"] "Liverpool+20"} :color "blue" }
-                        { :pos "c5"  :tile "tbig" :orient 0 :overlay {"g11" "twater"} :overlay-punch {"i9" "ttributary0r" }}
+                        { :pos "c3"  :tile "t506" :orient 1
+                          :label {["f2" "b14" "white"] "Liverpool+20"} :color "blue" }
+                        { :pos "c5"  :tile "tbig" :orient 0 :overlay {"g11" "twater"}
+                                                  :overlay-punch {"i9" "ttributary0r" }}
                         { :pos "c7"  :tile "t504" :orient 0 :overlay {"g11" "tmountain2"} }
                         { :pos "c9"  :tile "t500" :orient 0 :overlay {"g11" "tmountain2"} }
                         { :pos "c11" :tile "t504" :orient 0 :overlay {"g11" "tmountain2"} }
                         { :pos "c13" :tile "t500" :orient 0 :overlay {"g11" "twater2"} }
-                        { :pos "c15" :tile "t503" :orient 0 :overlay {"g11" "twater"} :overlay-punch {"g15" "ttributary2r" }}
+                        { :pos "c15" :tile "t503" :orient 0 :overlay {"g11" "twater"}
+                                                  :overlay-punch {"g15" "ttributary2r" }}
                         { :pos "c17" :tile "t505" :orient 4 :label ob2342 :color "blue" }
                         { :pos "d2"  :tile "t506" :orient 1 :label ob3434 :color "red" }
                         { :pos "d4"  :tile "t504" :orient 0 :overlay {"g11" "twater2"} }
@@ -149,7 +152,8 @@
                         { :pos "l12" :tile "t500" :orient 0 }
                         { :pos "l14" :tile "t500" :orient 0 }
                         { :pos "l16" :tile "t500" :orient 0 :overlay {"g11" "twater2"} }
-                        { :pos "l18" :tile "t500" :orient 0 :overlay {"g11" "twater"} :overlay-punch {"a9" "ttributary0r"} }
+                        { :pos "l18" :tile "t500" :orient 0 :overlay {"g11" "twater"}
+                                                  :overlay-punch {"a9" "ttributary0r"} }
                         { :pos "l20" :tile "t505" :orient 4 :label ob3456 :color "blue" }
                         { :pos "m1"  :tile "t507" :orient 0 :label ob3345 :color "red" }
                         { :pos "m3"  :tile "t500" :orient 0 :overlay {"g11" "twater2"} }
@@ -186,8 +190,8 @@
                         { :pos "p16" :tile "t505" :orient 0 :label ob2334 :color "blue" }
                         ]
                         :companies [
-                                    {:name "red" :token "red"}
-                                    {:name "green" :token "green"}
+                                    {:name "S&LR" :token "S_LR"}
+                                    {:name "B&DR" :token "B_DR"}
                                     {:name "blue" :token "blue"}
                                     {:name "yellow" :token "yellow"}
                                     {:name "magenta" :token "magenta"}]
@@ -200,9 +204,9 @@
 (def track-list {
   ;track-simple
                 "t500" {}
-                "t7"   {"#." 6}
-                "t8"   {"#." 15}
-                "t9"   {"#." 15}
+                "t7"   {"#." -1}
+                "t8"   {"#." -1}
+                "t9"   {"#." -1}
                 "t29"  {"#." 5}
                 "t27"  {"#." 5}
                 "t30"  {"#." 5}
@@ -249,9 +253,9 @@
                 "t3"   {"#." 5}
                 "t58"  {"#." 15}
                 "t4"   {"#." 15}
-                "t3g"  {"from" "t3"  "p." 2 "#." 5}
-                "t58g" {"from" "t58" "p." 2 "#." 7}
-                "t4g"  {"from" "t4"  "p." 2 "#." 7}
+                "t3g"  {"from" "t3"  "p." 2 "#." 5 "ve9" [20 "e9"]}
+                "t58g" {"from" "t58" "p." 2 "#." 7 "ve9" [20 "e7"]}
+                "t4g"  {"from" "t4"  "p." 2 "#." 7 "ve9" [20 "d12"]}
                 "t143" {"p." 3 "#." 5}
                 "t142" {"p." 3 "#." 5}
                 "t141" {"p." 3 "#." 5}
@@ -286,11 +290,11 @@
                "t339" {"#." 3}
                "t804" {"#." 2}
 ; manchester
-               "t519" { "t." ["M" "e15"] "p." 0 "cc9" [] "cf12" [] "cf6" []}
-               "t394" { "t." ["M" "e15"] "p." 1 "cc9" [0 3] "cf6" [1 4] "cf12" [2 5] "#." 1}
-               "t815" { "t." ["M" "e15"] "p." 2 "cc9" [0 1 3] "cf6" [1 4 5] "cf12" [2 3 5] "#." 1}
-               "t375" { "t." ["M" "e15"] "p." 3 "me9" ["c9" "f6" "f12"] "re9" ["f6" "d8" "f10" "d12"] "ce9" [0 1 2 3 4 5] "#." 1}
-               "tM04" { "t." ["M" "e15"] "p." 4 "re9" ["f6" "d8" "f10" "d12"] "ce9" [0 1 2 3 4 5] "#." 1}
+               "t519" { "t." ["M" "h6"] "p." 0 "cc9" [] "cf12" [] "cf6" []}
+               "t394" { "t." ["M" "h6"] "p." 1 "cc9" [0 3] "cf6" [1 4] "cf12" [2 5] "vc9" [40 "e15"] "#." 1}
+               "t815" { "t." ["M" "h6"] "p." 2 "cc9" [0 1 3] "cf6" [1 4 5] "cf12" [2 3 5] "vc9" [40 "e15"] "#." 1}
+               "t375" { "t." ["M" "h6"] "p." 3 "me9" ["c9" "f6" "f12"] "re9" ["f6" "d8" "f10" "d12"] "ce9" [0 1 2 3 4 5] "vc9" [80 "h12"] "#." 1}
+               "tM04" { "t." ["M" "h6"] "p." 4 "re9" ["f6" "d8" "f10" "d12"] "ce9" [0 1 2 3 4 5] "vc9" [80 "h12"] "#." 1}
 ; london docks
                "ghoriz" {"p." -2 ".A" [[0 5] [2 3] [1 4]]}
                "gchat" {"p." -2 ".A" [[1 4]] "cg11" [1 2 3]}

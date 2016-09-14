@@ -3,16 +3,16 @@
 (defn color-offboard
   [coords colors values]
   (loop [coords coords
-         values values
          colors colors
+         values values
          xd {}]
     (if (empty? values)
       xd
-      (recur (rest coords) (rest values) (rest colors) (assoc xd [(first coords) (second coords) (first colors)] (first values))))))
+      (recur (rest coords) (rest colors) (rest values) (assoc xd [(first coords) (second coords) (first colors)] (first values))))))
 
 (defn color-offboard-line
   [values]
-  (color-offboard ["f2" "e5" "d8" "c11"] ["yellow" "green" "brown"] values))
+  (color-offboard ["f2" "e5" "d8" "c11"] ["yellow" "brown" "lightgrey"] values))
 
 (def app-state {
     :rotate 30

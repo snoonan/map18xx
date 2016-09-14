@@ -13,8 +13,8 @@
 
 (defn lay-tile
   [state {:keys [pos tile] :as new-props}]
-  (let [new-count (get-in state [:tileinv/by-tile tile :remaining])]
-  (if (or (< 0 new-count) (nil? new-count))
+  (let [remaining (get-in state [:tileinv/by-tile tile :remaining])]
+  (if (or (not= 0 remaining) (nil? remaining))
     (-> state
         (update-in [:tile/by-pos pos] merge new-props)
         (update-in [:tileinv/by-tile tile :remaining] #(if (nil? %) % (dec %)))
@@ -39,6 +39,7 @@
 
 ; Because react.dom does not have an entry for 'use' so create one here.
 (def dom-use (js/React.createFactory "use"))
+(def dom-image (js/React.createFactory "image"))
 (def dom-textpath (js/React.createFactory "textpath"))
 
 (defn intersect-track
@@ -58,7 +59,7 @@
       (-> props
         (merge (if (:tile new-props) new-props))
         (assoc :station
-               (reduce (fn [a [k v]] (update a (get merge-list k k) conj v)) {} (:station props))))))
+               (reduce (fn [a [k v]] (update a (get merge-list k k) into v)) {} (:station props))))))
 
 (defn insert-tile-direct
   "Add a path to a tile."
@@ -135,6 +136,39 @@
   (hex-edge (om/get-reconciler this) this props [] nil))
   ;(om/transact! (om/get-reconciler this) `[(draw/edit-edge ~{:this this :props props :in []})]))
 
+(defn draw-text
+  [loc text [bg-color-default fg-color-default]]
+   (let [
+         [loc-start loc-end bg-color fg-color] (if (vector? loc) loc [loc nil nil nil])
+         [x-start y-start] (map (partial * 50) (pos-in-hex loc-start))
+         [x-end y-end] (map (partial * 50) (pos-in-hex loc-end))
+         fg-color (or fg-color fg-color-default)
+         bg-color (or bg-color bg-color-default)
+         x-delta (- x-end x-start)
+         y-delta (- y-end y-start)
+         dist (Math/sqrt (+ (* x-delta x-delta) (* y-delta y-delta)))
+         tag (rand)]
+     (if-not (nil? loc)
+       (if-not (= -68.75 x-end)
+         (dom/g #js { :transform "scale(0.02)"}
+            (dom/path #js {:id (str tag loc-start)
+                           :stroke bg-color :strokeWidth 15
+                           :d (str "M"x-start" "y-start"L"x-end" "y-end) })
+            (dom/text #js {:fill fg-color
+                           :dangerouslySetInnerHTML
+                           #js {:__html
+                                (str "<textPath xlink:href='#"(str tag loc-start)"' textLength='"dist"' lengthAdjust='spacingAndGlyphs'>"text"</textPath>")}}
+                     (comment "Does not render correctly" (dom-textpath #js {:xlinkHref (str "#" pos loc-start)
+                                         :textLength dist    ;; to a first aproximation
+                                         :lengthAdjust "spacingAndGlyphs" }
+                                    text))
+                     ))
+         (dom/text #js {:x x-start :y y-start
+                        :fontSize 16 :textAnchor "middle"
+                        :fill fg-color
+                        :transform "scale(.02)"}
+                   text)))))
+
 (defui TileView
     static om/Ident
     (ident [this {:keys [pos]}] [:tile/by-pos pos])
@@ -147,7 +181,7 @@
           rotate  (:rotate @(om/app-state (om/get-reconciler this)))
           width (if (= rotate 30) 0.86 1.5)
           height (if (= rotate 30) 1.5 0.86)
-          ]
+          tile-info (@upg/track-list tile)]
       (apply dom/g #js { :transform (str "translate("
                               (+ 4 (* width col)) ","
                               (+ 4 (* height row)) ")"
@@ -176,26 +210,7 @@
                                                 rotate(-" rotate ")")
                                }))
                  (:overlay-punch props)))
-        (into (map (fn [[[loc-start loc-end bg-color fg-color] text]]
-                     (let [[x-start y-start] (map (partial * 50) (pos-in-hex loc-start))
-                           [x-end y-end] (map (partial * 50) (pos-in-hex loc-end))
-                           fg-color (or fg-color "black")
-                           bg-color (or bg-color "white")
-                           ]
-                       (dom/g #js { :transform "scale(0.02)"}
-                          (dom/path #js {:id (str pos loc-start)
-                                         :stroke bg-color :strokeWidth 15
-                                         :d (str "M"x-start" "y-start"L"x-end" "y-end) })
-                          (dom/text #js {:fill fg-color
-                                         :dangerouslySetInnerHTML
-                                         #js {:__html
-                                              (str "<textPath xlink:href='#"(str pos loc-start)"' textLength='"(- x-end x-start)"' lengthAdjust='spacingAndGlyphs'>"text"</textPath>")}}
-                                   (comment "Does not render correctly" (dom-textpath #js {:xlinkHref (str "#" pos loc-start)
-                                                       :textLength (- x-end x-start)    ;; to a first aproximation
-                                                       :lengthAdjust "spacingAndGlyphs" }
-                                                  text))
-                                   ))))
-               (:label props)))
+        (into (map (fn [[loc text]] (draw-text loc text [[(hex-colors (get tile-info "p.")) "black"]])) (:label props)))
         (conj (draw-tile this props rotate)))))))
 
 (def tile-view (om/factory TileView {:keyfn :pos}))
@@ -260,8 +275,7 @@
                               :y scale
                               :fontSize 16 :textAnchor "middle"
                               :fill "black" }
-                    remaining)
-          ))))
+                    (if (> 0 remaining) "∞" remaining))))))
 
 (def tile-set-view (om/factory TileSetView {:keyfn :tile}))
 
@@ -302,15 +316,15 @@
               (into (case op
                 "c" (into
                       (map (fn [loc co]
-                              (dom-use (clj->js (merge {:xlinkHref "defs.svg#city"
-                                                        :transform (str "translate(" ((pos-in-hex loc) 0) "," ((pos-in-hex loc) 1) ")") }
-                                               (if pos
-                                                 (if co
-                                                   {:color co}
-                                                   {:color "white"
-                                                    :onClick (fn [e] (.stopPropagation e) (token-city this pos location))})
-                                                 {:color "white"}
-                                                 )))))
+                             (dom/g nil
+                             (dom-use #js {:xlinkHref "defs.svg#city"
+                                           :transform (str "translate(" ((pos-in-hex loc) 0) "," ((pos-in-hex loc) 1) ")")
+                                           :onClick (fn [e] (.stopPropagation e) (token-city this pos location))
+                                           :color "white"})
+                             (if co
+                               (dom-image #js {:xlinkHref (str co ".png")
+                                               :height 0.5 :width 0.5
+                                               :transform (str "translate(" (- ((pos-in-hex loc) 0) 0.25) "," (- ((pos-in-hex loc) 1) 0.25) ")")}))))
                            stations
                            (into (vec (get-in props [:station location])) (repeat (count stations) nil)))
                       (for [loc1 stations loc2 stations]
@@ -323,16 +337,11 @@
                 "d" (for [loc stations]
                        (dom-use #js {:xlinkHref "defs.svg#dit"
                                      :transform (str "translate(" ((pos-in-hex loc) 0) "," ((pos-in-hex loc) 1) ")") }))
-                "t" [(dom/text #js {:x (* 50 ((pos-in-hex (second v)) 0))
-                                    :y (* 50 ((pos-in-hex (second v)) 1))
-                                    :fontSize 16 :textAnchor "middle"
-                                    :fill "black"
-                                    :transform "scale(.02)"} (first v))]
-                "l" [(dom/text #js {:x (* 50 ((pos-in-hex location) 0))
-                                    :y (* 50 ((pos-in-hex location) 1))
-                                    :fontSize 16 :textAnchor "middle"
-                                    :fill "black"
-                                    :transform "scale(.02)"} v)]
+                "t" [(draw-text (second v) (first v) [(hex-colors (get tile-info "p.")) "black"])]
+                "l" [(draw-text location v [(hex-colors (get tile-info "p.")) "black"])]
+                "v" [(dom-use #js {:xlinkHref (str "defs.svg#value" (if (> 100 (first v)) "2" "3"))
+                                   :transform (str "translate(" ((pos-in-hex (second v)) 0) "," ((pos-in-hex (second v)) 1) ")") })
+                     (draw-text (second v) (first v) ["white" "black"])]
                 nil)))))
             [ (dom-use #js {:xlinkHref "defs.svg#hex" :fill color}) ] tile-info))))
 
