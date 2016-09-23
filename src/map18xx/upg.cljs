@@ -115,6 +115,7 @@
 (defn upgrade
   [tile orient edges]
   (let [[new-orient new-tile] (unique-path? tile orient edges)
+        _ (prn "up tile orient edges" tile orient edges)
         new-spec (@track-list new-tile)
         org-spec (@track-list tile)
         new-merge-keys (filter #(substring? (first %) "m") (keys new-spec))

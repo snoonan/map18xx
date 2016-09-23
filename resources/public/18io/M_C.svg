@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg"   xmlns:xlink="http://www.w3.org/1999/xlink" width="100" height="100" version="1.1">
+  <clipPath id="tokenclip">
+    <circle cx="50" cy="50" r="50" clip-rule="evenodd" fill="black" />
+  </clipPath>
+  <g clip-path="url(#tokenclip)" >
+    <rect x="0" y="0" width="100" height="100" fill="orange"/>
+    <path d="M0 100 L 100 0 L 100 100 z" fill="orange"/>
+    <path d="M 5 50 L 95 50" id="textpath" stroke="none" />
+    <text>
+       <textPath stroke="orange" fill="orange" lengthAdjust = "spacingAndGlyphs" font-size="22" xlink:href="#textpath" textLength="90" style="dominant-baseline: central;">
+         M&amp;C
+       </textPath>
+    </text>
+  </g>
+</svg>

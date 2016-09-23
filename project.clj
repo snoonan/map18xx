@@ -8,7 +8,8 @@
 
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [org.clojure/clojurescript "1.8.51"]
-                 [org.omcljs/om "1.0.0-alpha41"]]
+                 [org.omcljs/om "1.0.0-alpha41"]
+                 [cljs-ajax "0.5.8"]]
 
 
   :plugins [[lein-figwheel "0.5.4-7"]

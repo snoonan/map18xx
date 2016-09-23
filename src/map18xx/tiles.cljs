@@ -52,7 +52,7 @@
       (recur tile edges (next upgrademaps))))))
 
 (defn upgrade-to
-  "Determine tile and orient to upgrade a tile to when adding a path from e1 to e2."
+  "Determine tile and orient to upgrade a tile to when adding a paths joining edges."
   [{ :keys [pos tile orient] :as props} edges]
   (let [ real (vec (keep identity edges))
         [merge-list new-props] (upg/upgrade tile orient real)]
@@ -63,9 +63,9 @@
 
 (defn insert-tile-direct
   "Add a path to a tile."
-  [[this pos-entry] e1 e2]
+  [[this pos-entry] edges]
   (if (nil? (pos-entry :color))
-      (let [upgrade (upgrade-to pos-entry [e1 e2])]
+      (let [upgrade (upgrade-to pos-entry edges)]
         (if (not= (:tile pos-entry) (:tile upgrade))
           (do
             (om/transact! this `[(hex/lay-tile ~(merge upgrade {:overlay {}})) [:tileinv/by-tile ~(:tile pos-entry)] [:tileinv/by-tile ~(:tile upgrade)]])
@@ -75,7 +75,7 @@
 (defn insert-tile
   "Add a path to a tile."
   [[this pos-entry] e1 e2]
-  (insert-tile-direct [this pos-entry] e1 (mod (+ 3 e2) 6)))
+  (insert-tile-direct [this pos-entry] [e1 (mod (+ 3 e2) 6)]))
 
 (defn token-city
   [this pos station]
@@ -124,7 +124,7 @@
             new-tile (some #(if (keyword? %) %) in)
             tile (if new-tile (name new-tile) (:tile props))
             new-props (assoc props :tile tile)
-            insert (apply insert-tile-direct [to-edit new-props] edges)    ; No need to wrap as it will be wrapped later.
+            insert (insert-tile-direct [to-edit new-props] edges)    ; No need to wrap as it will be wrapped later.
             ]
         (if insert
          (om/transact! this '[(draw/edit-done) :ephemeral/draw])
@@ -168,6 +168,27 @@
                         :transform "scale(.02)"}
                    text)))))
 
+(defn color-offboard
+  [coordss colors values]
+  (loop
+    [coordss coordss
+     colors colors
+     values values
+     xd {}]
+     (let [ [rest-colors rest-values result-xd]
+                     (loop
+                        [coords (first coordss)
+                        colors colors
+                        values values
+                        xd xd]
+                        (let [[start end] coords]
+                        (if end (recur (rest coords) (rest colors) (rest values)
+                                (assoc xd [start end (first colors)] (first values)))
+                            (list colors values xd))))]
+        (if (empty? values)
+            xd
+            (recur (rest coordss) rest-colors rest-values result-xd)))))
+
 (defui TileView
     static om/Ident
     (ident [this {:keys [pos]}] [:tile/by-pos pos])
@@ -177,7 +198,9 @@
     (render [this]
     (let [{:keys [tile pos orient] :as props} (om/props this)
           [row col] (utils/pos-to-rc pos)
-          rotate  (:rotate @(om/app-state (om/get-reconciler this)))
+          app-state  @(om/app-state (om/get-reconciler this))
+          rotate  (:rotate app-state)
+          path  (:mappath app-state)
           width (if (= rotate 30) 0.86 1.5)
           height (if (= rotate 30) 1.5 0.86)
           tile-info (@upg/track-list tile)]
@@ -195,22 +218,25 @@
                       (fn [e] (hex-edit props pos this))
                   }
         (-> '()
-        (into (map (fn [[loc sym]]
+        (into (map (fn [[loc [sym cost]]]
                  (dom-use #js {:xlinkHref (str "defs.svg#" sym)
                                :transform (str "translate(" ((pos-in-hex loc) 0) ","
                                                             ((pos-in-hex loc) 1) ")" "
                                                 rotate(-" rotate ")")
                                }))
                  (:overlay props)))
-        (into (map (fn [[loc sym]]
+        (into (map (fn [[loc [sym cost]]]
                  (dom-use #js {:xlinkHref (str "defs.svg#" sym)
                                :transform (str "translate(" ((pos-in-hex loc) 0) ","
                                                             ((pos-in-hex loc) 1) ")" "
                                                 rotate(-" rotate ")")
                                }))
                  (:overlay-punch props)))
-        (into (map (fn [[loc text]] (draw-text loc text [[(hex-colors (get tile-info "p.")) "black"]])) (:label props)))
-        (conj (draw-tile this props rotate)))))))
+        (into (map (fn [[loc text]] (draw-text loc text [[(hex-colors (get tile-info "p.")) "black"]]))
+                   (if (vector? (:label props))
+                     (color-offboard (:offboard-pos app-state) (:offboard-colors app-state) (:label props))
+                     (:label props))))
+        (conj (draw-tile this props rotate path)))))))
 
 (def tile-view (om/factory TileView {:keyfn :pos}))
 
@@ -279,7 +305,7 @@
 (def tile-set-view (om/factory TileSetView {:keyfn :tile}))
 
 (defn draw-tile
-  [this {:keys [pos tile orient color] :as props}]
+  [this {:keys [pos tile orient color] :as props} rotate path]
   (let [tile-info (@upg/track-list tile)
         color (or color (hex-colors (get tile-info "p."))) ]
 (apply dom/g #js { :transform (str "rotate(" (* orient 60) ")") }
@@ -321,7 +347,7 @@
                                            :onClick (fn [e] (.stopPropagation e) (token-city this pos location))
                                            :color "white"})
                              (if co
-                               (dom-image #js {:xlinkHref (str co ".png")
+                               (dom-image #js {:xlinkHref (str path "/" co)
                                                :height 0.5 :width 0.5
                                                :transform (str "translate(" (- ((pos-in-hex loc) 0) 0.25) "," (- ((pos-in-hex loc) 1) 0.25) ")")}))))
                            stations
@@ -338,9 +364,11 @@
                                      :transform (str "translate(" ((pos-in-hex loc) 0) "," ((pos-in-hex loc) 1) ")") }))
                 "t" [(draw-text (second v) (first v) [(hex-colors (get tile-info "p.")) "black"])]
                 "l" [(draw-text location v [(hex-colors (get tile-info "p.")) "black"])]
-                "v" [(dom-use #js {:xlinkHref (str "defs.svg#value" (if (> 100 (first v)) "2" "3"))
+                "v" (if (= 2 (count v))
+                      [(dom-use #js {:xlinkHref (str "defs.svg#value" (if (> 100 (first v)) "2" "3"))
                                    :transform (str "translate(" ((pos-in-hex (second v)) 0) "," ((pos-in-hex (second v)) 1) ")") })
                      (draw-text (second v) (first v) ["white" "black"])]
+                      [])
                 nil)))))
             [ (dom-use #js {:xlinkHref "defs.svg#hex" :fill color}) ] tile-info))))
 

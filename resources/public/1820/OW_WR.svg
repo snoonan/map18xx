@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg"   xmlns:xlink="http://www.w3.org/1999/xlink" width="100" height="100" version="1.1">
+  <clipPath id="tokenclip">
+    <circle cx="50" cy="50" r="50" clip-rule="evenodd" fill="black" />
+  </clipPath>
+  <g clip-path="url(#tokenclip)" >
+    <rect x="0" y="0" width="100" height="50" fill="#d39c47"/>
+    <rect x="0" y="12" width="100" height="12" fill="#e26b84"/>
+    <rect x="0" y="50" width="100" height="50" fill="#d39c47"/>
+    <rect x="0" y="77" width="100" height="12" fill="#e26b84"/>
+    <rect x="0" y="37" width="100" height="25" fill="white"/>
+    <path d="M 5 50 L 95 50" id="textpath" stroke="none" />
+    <text>
+       <textPath lengthAdjust = "spacingAndGlyphs" font-size="22" xlink:href="#textpath" textLength="90" style="dominant-baseline: central;">
+         OW&amp;WR
+       </textPath>
+    </text>
+  </g>
+</svg>

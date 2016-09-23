@@ -4,6 +4,8 @@
             [om.dom :as dom]
             [clojure.string :as string]
             [clojure.walk :as walk]
+            [cljs.tools.reader :as r]
+            [ajax.core :refer [GET]]
             [map18xx.map1820 :as board]
             [map18xx.companies :as companies]
             [map18xx.tiles :as tiles]
@@ -13,11 +15,20 @@
             [map18xx.upg :as upg]
             ))
 
+(def app-state {})
+
+(defn load-game-data
+  [this path response]
+  (let [game-data (r/read-string response)]
+    (om/merge! (om/get-reconciler this)
+            (assoc game-data :inventory (upg/add-tiles (:track-list game-data)) :mappath path))))
+
 (defui MapView
        static om/IQuery
        (query [this]
               [{:tiles (om/get-query tiles/TileView)}
                {:companies [:name :color]}
+               :mappath
                {:inventory (om/get-query tiles/TileSetView)}
                ;(om/get-query tiles/TileEditView)
                :ephemeral/draw :transform-track
@@ -27,6 +38,7 @@
                (let [scale 30
                      tiles (-> this om/props :tiles)
                      companies (-> this om/props :companies)
+                     mappath (-> this om/props :mappath)
                      editting (-> this om/props :ephemeral/draw)
                      full-tile-set (upg/tile-sort (-> this om/props :inventory))
                      new-tile (some #(if (keyword? %) %) (-> editting :in))
@@ -52,20 +64,35 @@
                                     [maxx maxy] %1]
                                    [(max x maxx) (max y maxy)]
                                     ) [0 0] tiles)]
-                (dom/div #js {:style #js {:display "flex"} }
+                 (if (empty? tiles)
+                   (dom/div nil
+                      "variant description location: "
+                      (dom/input #js {:type "text"
+                                      :ref "mapdata"
+                                      })
+                      (dom/button #js {
+                                      :onClick (fn [e]
+                                                 (let [path (.. (dom/node this "mapdata") -value)]
+                                                  (GET
+                                                    (str path "/map.edn")
+                                                    {:handler (partial load-game-data this path)})))
+                                      } "Load"))
+                (dom/div #js {:style #js {:display "flex"  :justifyContent "space-between"}}
                  (dom/div #js {:style #js {:display "flex" :flexDirection "column"} }
-                   (companies/company-edit-view {:company-list companies :ephemeral/operating { :selected (-> this om/props :ephemeral/operating :selected) }} this)
+                   (companies/company-edit-view {:company-list companies
+                                                 :ephemeral/operating {:selected (-> this om/props :ephemeral/operating :selected)}
+                                                 :mappath mappath} this)
                    (dom/div #js {:style #js {:display "flex" :flexWrap "wrap"} }
                             (mapv tiles/tile-set-view tile-set))
                  )
                  (dom/svg #js {:width (* (+ mx 8) width scale) :height (* (+ my 8) height scale) :overflow "scroll"}
                   (apply dom/g #js {:transform (str "scale("scale")")}
                    (conj (mapv tiles/tile-view tiles) edit-select )))
-                 ))))
+                 )))))
 
 (def reconciler
   (om/reconciler
-    {:state (assoc board/app-state :inventory (upg/add-tiles board/track-list))
+    {:state app-state
      :parser (om/parser {:read p/read :mutate p/mutate})}))
 
 (om/add-root! reconciler

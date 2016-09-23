@@ -19,7 +19,7 @@
 (comment
 (defui CompanyEditView
     static om/IQuery
-    (query [this] '[:ephemeral/operating :company-list])
+    (query [this] '[:ephemeral/operating :company-list :mappath])
     Object
     (render [this]
     (let [{:keys [:ephemeral/operating :company-list] :as props} (om/props this)
@@ -32,24 +32,19 @@
                                     :fontSize (if (= (:selected operating) (:token company)) 16 12)
                                     :onClick (fn [e] (select-company this (:token company)))} (:token company)))))))
 
-(def company-edit-view (om/factory CompanyEditView {:keyfn :operating}))
+(def company-edit-view (om/factory CompanyEditView {:keyfn :token}))
 )
 
 (defn company-edit-view
-  [{:keys [:ephemeral/operating :company-list] :as props} this]
+  [{:keys [:ephemeral/operating :company-list :mappath] :as props} this]
   (let [ selected (:selected operating)
     ]
-      (dom/svg #js { :width 120 :height (* 60 (count company-list)) }
-               (apply dom/g #js {:transform "scale(30)" }
-                 (map-indexed (fn [i company]
-                    (dom/g #js {:transform (str "translate(1," (+ 1 (* 2 i)) ")")}
-                       (dom-image #js {:xlinkHref (str (:token company) ".png")
-                                       :height 1 :width 1
+       (apply dom/div #js {:style #js {:display "flex" :flexWrap "wrap"} }
+                 (map (fn [company]
+                    (dom/div #js { :style #js {:flexBasis 120 }}
+                       (dom/img #js {:src (str mappath "/" (:token company))
+                                       :height 30 :width 30
                                        :onClick (fn [e] (select-company this (:token company)))})
-                       (dom/g #js {:transform "translate(1.1, 0.5)"} 
-                         (dom/text #js {:x 0 :y 0
-                                       :fontSize (if (= selected (:token company)) 20 16)
-                                       :fill "black"
-                                       :transform "scale(.02)"
-                                        } (:name company)))))
-                      company-list)))))
+                       (dom/span #js { :style #js {:fontSize (if (= selected (:token company)) "x-large" "medium") } }
+                                (:name company))))
+                      company-list))))
