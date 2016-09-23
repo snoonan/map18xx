@@ -178,6 +178,7 @@
                                 {:name "L&SR" :token "L_SR.svg"}
                                 {:name "MSG&AR" :token "MSG_AR.svg"}
                                 {:name "M&BR" :token "M_BR.svg"}
+                                {:name "M&LR" :token "M_LR.svg"}
                                 {:name "M&PR" :token "M_PR.svg"}
                                 {:name "N&BR" :token "N_BR.svg"}
                                 {:name "N&PR" :token "N_PR.svg"}
