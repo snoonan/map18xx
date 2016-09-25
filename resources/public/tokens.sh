@@ -1,6 +1,6 @@
 #!/bin/bash
 
-while read name upper lower upper_band lower_band; do
+while IFS=: read -r name upper lower upper_band lower_band; do
     # format is upper [lower [upper_band [lower_band]]]
     # defaults are:
     #   one band specified: lower band is same as upper band

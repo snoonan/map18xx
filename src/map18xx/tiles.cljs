@@ -53,9 +53,8 @@
 
 (defn upgrade-to
   "Determine tile and orient to upgrade a tile to when adding a paths joining edges."
-  [{ :keys [pos tile orient] :as props} edges]
-  (let [ real (vec (keep identity edges))
-        [merge-list new-props] (upg/upgrade tile orient real)]
+  [{ :keys [pos tile orient] :as props} new-tile new-orient]
+  (let [[merge-list new-props] (upg/upgrade tile orient new-tile new-orient) ]
       (-> props
         (merge (if (:tile new-props) new-props))
         (assoc :station
@@ -63,19 +62,25 @@
 
 (defn insert-tile-direct
   "Add a path to a tile."
-  [[this pos-entry] edges]
+  [this pos-entry new-tile new-orient]
   (if (nil? (pos-entry :color))
-      (let [upgrade (upgrade-to pos-entry edges)]
+      (let [upgrade (upgrade-to pos-entry new-tile new-orient) ]
         (if (not= (:tile pos-entry) (:tile upgrade))
           (do
             (om/transact! this `[(hex/lay-tile ~(merge upgrade {:overlay {}})) [:tileinv/by-tile ~(:tile pos-entry)] [:tileinv/by-tile ~(:tile upgrade)]])
             true)
         false))))
 
+(defn insert-tile-with
+  "Add a path to a tile."
+  [this pos-entry edges]
+  (let [ real (vec (keep identity edges)) ]
+  (apply insert-tile-direct this pos-entry (upg/unique-path? (pos-entry :tile) (pos-entry :orient) real))))
+
 (defn insert-tile
   "Add a path to a tile."
   [[this pos-entry] e1 e2]
-  (insert-tile-direct [this pos-entry] [e1 (mod (+ 3 e2) 6)]))
+  (insert-tile-with this pos-entry [e1 (mod (+ 3 e2) 6)]))
 
 (defn token-city
   [this pos station]
@@ -124,7 +129,7 @@
             new-tile (some #(if (keyword? %) %) in)
             tile (if new-tile (name new-tile) (:tile props))
             new-props (assoc props :tile tile)
-            insert (insert-tile-direct [to-edit new-props] edges)    ; No need to wrap as it will be wrapped later.
+            insert (insert-tile-with to-edit new-props edges)    ; No need to wrap as it will be wrapped later.
             ]
         (if insert
          (om/transact! this '[(draw/edit-done) :ephemeral/draw])
@@ -134,6 +139,12 @@
   [props pos this]
   (hex-edge (om/get-reconciler this) this props [] nil))
   ;(om/transact! (om/get-reconciler this) `[(draw/edit-edge ~{:this this :props props :in []})]))
+
+(defn hex-select
+  [pos-entry new-tile new-orient this]
+  (do
+    (insert-tile-direct this pos-entry new-tile new-orient)
+    (om/transact! this '[(draw/edit-done) :ephemeral/draw])))
 
 (defn draw-text
   [loc text [bg-color-default fg-color-default]]
@@ -286,21 +297,29 @@
     (query [this] [:tile :remaining])
     Object
     (render [this]
-    (let [
-          {:keys [tile remaining] :as props} (om/props this)
+    (let [ {:keys [tile remaining] :as props} (om/props this)
           rotate  (:rotate @(om/app-state (om/get-reconciler this)))
+          options (om/get-computed this :options)
+          edit (om/get-computed this :ephemeral/draw)
           width (if (= rotate 30) 0.86 1.5)
           height (if (= rotate 30) 1.5 0.86)
-          scale 30
-          ]
+          scale 30 ]
       (dom/svg #js {:width (* 2.5 scale) :height (* 2 scale)}
-        (dom/g #js { :transform (str "translate(" scale "," scale ") scale(" scale ") rotate(" rotate ")") }
+        (dom/g (clj->js (merge {:transform (str "translate(" scale "," scale ") scale(" scale ") rotate(" rotate ")")}
+                    (if (not (empty? options))
+                      {:onClick (fn [e]
+                                  (hex-select
+                                    (-> edit :last second)
+                                    (first options)
+                                    (first (second options))
+                                    (-> edit :last first)))}
+                      {})))
           (draw-tile this props 0))
-          (dom/text #js {:x (* 2.1 scale)
-                              :y scale
-                              :fontSize 16 :textAnchor "middle"
-                              :fill "black" }
-                    (if (> 0 remaining) "∞" remaining))))))
+        (dom/text #js {:x (* 2.1 scale)
+                       :y scale
+                       :fontSize 16 :textAnchor "middle"
+                       :fill "black" }
+                  (if (> 0 remaining) "∞" remaining))))))
 
 (def tile-set-view (om/factory TileSetView {:keyfn :tile}))
 

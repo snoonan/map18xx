@@ -44,21 +44,12 @@
                      new-tile (some #(if (keyword? %) %) (-> editting :in))
                      edges (remove keyword? (-> editting :in))
                      basetile (if new-tile (name new-tile) (-> editting :last (get 1) :tile))
-                     tile-set-list (if (:drawing editting)
-                                      (reduce (fn [a v] (into a (second v))) []
-                                        (upg/has-path basetile
-                                                      (-> editting :last (get 1) :orient)
-                                                      edges))
-                                      (map #(% :tile) full-tile-set))
-                     tile-set (filter #(some (partial = (:tile %)) tile-set-list) full-tile-set)
                      rotate  (:rotate board/app-state)
                      width (if (= rotate 30) 0.86 1.5)
                      height (if (= rotate 30) 1.5 0.86)
                      edit-select (tiles/tile-edit-view
-                                   {
-                                    :ephemeral/draw (-> this om/props :ephemeral/draw)
-                                    :transform-track (-> this om/props :transform-track)
-                                    })
+                                   {:ephemeral/draw (-> this om/props :ephemeral/draw)
+                                    :transform-track (-> this om/props :transform-track)})
                      [mx my] (reduce #(
                                let [[y x] (utils/pos-to-rc (:pos %2))
                                     [maxx maxy] %1]
@@ -82,8 +73,24 @@
                    (companies/company-edit-view {:company-list companies
                                                  :ephemeral/operating {:selected (-> this om/props :ephemeral/operating :selected)}
                                                  :mappath mappath} this)
-                   (dom/div #js {:style #js {:display "flex" :flexWrap "wrap"} }
-                            (mapv tiles/tile-set-view tile-set))
+                   (let [tile-options (if (:drawing editting)
+                                        (upg/upgrade-options basetile
+                                                      (-> editting :last (get 1) :orient)
+                                                      edges)
+                                        [])
+                         tile-set-list (if (:drawing editting)
+                                          (reduce (fn [a v] (conj a (first v))) [] tile-options)
+                                          (map #(% :tile) full-tile-set))
+                         tile-set (filter #(some (partial = (:tile %)) tile-set-list) full-tile-set)]
+                       (dom/div #js {:style #js {:display "flex" :flexWrap "wrap"} }
+                                (mapv #(tiles/tile-set-view
+                                         (om/computed %
+                                         {:options (first (filter
+                                                        (fn [v] (and (= (:tile %) (first v))
+                                                                     (= 1 (count (second v)))))
+                                                        tile-options))
+                                          :ephemeral/draw editting}))
+                                  tile-set)))
                  )
                  (dom/svg #js {:width (* (+ mx 8) width scale) :height (* (+ my 8) height scale) :overflow "scroll"}
                   (apply dom/g #js {:transform (str "scale("scale")")}
