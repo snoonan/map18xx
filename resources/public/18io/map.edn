@@ -10,7 +10,7 @@
             { :pos "b2"  :tile "t500" :orient 0 }
             { :pos "b4"  :tile "t500" :orient 0 }
             { :pos "b6"  :tile "t500" :orient 0 }
-            { :pos "b8"  :tile "ttoledo" :orient 0 :station {"g7" ["T_IR.svg"], "f12" ["E_K.svg"]} :overlay-punch {"e5" ["pinkanchor"]}}
+            { :pos "b8"  :tile "ttoledo" :orient 0 :station {"g7" ["T_IR.svg"], "f12" ["E_K.svg"]} :overlay-punch {"b10" ["pinkanchor"]}}
             { :pos "b18" :tile "t501" :orient 0 :overlay-punch {"e5" ["pinkanchor"]}}
             { :pos "b20" :tile "t503" :orient 0 :station {"e9" ["ASH.svg"]} :overlay-punch {"e5" ["pinkanchor"]}}
             { :pos "b22" :tile "t39"  :orient 3 :color "grey"}
@@ -22,7 +22,7 @@
             { :pos "c11" :tile "tsandusky" :orient 0 :station {"g11" ["MRLE.svg"] "d12" ["SC_I.svg"]} :overlay-punch {"c7" ["pinkanchor"]}}
             { :pos "c13" :tile "t500" :orient 0 }
             { :pos "c15" :tile "t501" :orient 0 :overlay-punch {"g11" ["pinkanchor"]}}
-            { :pos "c17" :tile "t6Y"  :orient 4 :station {"e9" ["CCC"]} :overlay-punch {"g11" ["pinkanchor"]}}
+            { :pos "c17" :tile "t6Y"  :orient 4 :station {"e9" ["CCC.svg"]} :overlay-punch {"g11" ["pinkanchor"]}}
             { :pos "c19" :tile "t500" :orient 0 }
             { :pos "c21" :tile "t500" :orient 0 }
             { :pos "d2"  :tile "t500" :orient 0 }
@@ -173,9 +173,10 @@
                 "t57"  {"#." 5}
                 "t14"  {"#." 5}
                 "t15"  {"#." 5}
+                "t15TP"  {"#." 1 "from" "t15" "t." ["TP" "h6"] }
                 "t611" {"#." 3}
                 "t63"  {"#." 2}
-                "t51"  {"#." 3}
+                "t51"  {"#." 3 "me9" ["d6" "e9"]}
 ;track-dits
                 "t501" {}
                 "t3"   {"#." 2}
@@ -194,10 +195,10 @@
                 "t506" {}
                 "t507" {}
                  "ttoledo"   {"p." 1  "t." ["TP" "c11"] "cf12" [2 5] "cg7" [3 5] "vf12" [20] "vg7" [20]}
-                 "thudson"   {"p." 3  "cf12" [2 "e9"] "vf12" [20] ".e9" [[0 "e9"] [1 "e9"] [3 "e9"] [4 "e9"]]}
                  "tsandusky" {"p." 2  "cg11" [2 3] "cd12" [1] "cf6" [4] "vg11" [20] "vd12" [20] "vf6" [20] "t." ["S" "h12"]}
-                 "tfranklin" {"p." 3  "cd6" [5 "e9"] "vd6" [10] ".e9" [[0 "e9"] [2 "e9"] [3 "e9"]]}
-                 "tmorrow"   {"p." -2 "cg9" [3 "e9"] "vg9" [10] ".e9" [[0 "e9"] [1 "e9"] [2 "e9"] [5 "e9"]]}
+                 "thudson"   {"p." 3  "t." ["city"] "cf12" [2 "e9"] "vf12" [20] ".e9" [0 1 3 4]}
+                 "tfranklin" {"p." 3  "t." ["city"] "cd6" [5 "e9"] "vd6" [10] ".e9" [0 2 3]}
+                 "tmorrow"   {"p." -2 "t." ["city"] "cg9" [3 "e9"] "vg9" [10] ".e9" [0 1 2 5]}
                  "tcincin"   {"p." 1  "t." ["C" "h10"] "cd5" [4 5] "cc8" [0 4] "cd12" [1 4] "cf12" [2 4] "vd5" [20] "vc8" [20] "vd12" [20] "vf12" [20]}
                  "tcincinG"  {"p." 2  "t." ["C" "h10"] "cd5" [4 5] "cc8" [0 4] "cd12" [1 4] "cf12" [2 4] "vd5" [30] "vc8" [30] "vd12" [30] "vf12" [30] "#." 1}
                  "tcincinB"  {"p." 3  "t." ["C" "h10"] "cd5" [4 5] "cc8" [0 4] "cd12" [1 4] "cf12" [2 4] "vd5" [60] "vc8" [60] "vd12" [60] "vf12" [60] "#." 1}
@@ -207,7 +208,7 @@
                  "t622"      {"p." 2  "ce9" [0 1 2 4] "re9" ["f8" "d10"] "ve9" [40 "e14"] "t." ["Y" "h12"] "#." 1}
                  "t367"      {"p." 3  "ce9" [0 1 2 3 4] "re9" ["f8" "d10"] "ve9" [50 "e14"] "t." ["Y" "h12"] "#." 2}
                  "t213"      {"p." 4  "ce9" [0 1 2 3 5] "re9" ["f8" "d10"] "ve9" [60 "e14"] "t." ["Y" "f6"]}
-                 "t169"      {"p." 3  "ce9" [0 1 2 3] "re9" ["f8" "d10"] "ve9" [50 "e14"] "t." ["S" "h12"] "#." 1}
+                 "t169"      {"p." 3  "ce9" [0 1 2 3] "re9" ["f7" "f11" "d9"] "ve9" [50 "e14"] "t." ["S" "h12"] "#." 1}
                  "t5TP"      {"p." 2  "ce9" [0 1] "re9" ["c11"] "ve9" [40 "e14"] "t." ["TP" "f6"] "#." 2}
                  "t984"      {"p." 3  "ce9" [0 1 2 3] "re9" ["f8" "d10"] "ve9" [50 "e14"] "t." ["TP" "f6"] "#." 2}
                  }}

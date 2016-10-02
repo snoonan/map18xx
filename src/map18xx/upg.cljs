@@ -64,13 +64,27 @@
 ; all-in-lists returns a list of true/false for each xs if a complete match was in any ys.
 (defn all-in-lists [xs ys] (and (not (nil? ys)) (every? #(in-lists % ys) xs)))
 
+(defn merged-edges
+  [from-map to-map]
+  (let [
+        new-merge-keys (filter #(substring? (first %) "m") (keys to-map))
+        org-merge-keys (first (vals (select-keys to-map new-merge-keys)))
+        ]
+        (reduce
+                   (fn
+                     [a [k v]]
+                     (update a "c" into
+                                  (map #(filter
+                                    (fn [x] (not-any? (partial = x) org-merge-keys))
+                                    %) v)))
+                   {"c" []} (get-edges from-map))))
+
 (defn upgrade-from?
   "Remove entries from to-map that are in from-map, nil if something is in from-map but not to-map Return remaining items"
   [from-map from-orient to-map to-orient]
   (let [
         track-map (rotate-edges to-orient (get-edges to-map))
-        from-map (rotate-edges from-orient (get-edges from-map))
-        ; If all lists in from-map have supersets in track-map then true
+        from-map (rotate-edges from-orient (merged-edges from-map to-map))
         filtered (map (fn [[k v]] (all-in-lists (get from-map k) (get track-map k))) from-map)
         missed (some false? filtered)
         ]
@@ -128,13 +142,16 @@
   (let [new-spec (@track-list new-tile)
         org-spec (@track-list tile)
         new-merge-keys (filter #(substring? (first %) "m") (keys new-spec))
+        org-merge-keys (first (vals (select-keys new-spec new-merge-keys)))
         new-city-keys (filter #(substring? (first %) "c") (keys new-spec))
-        org-city-keys (filter #(substring? (first %) "c") (keys org-spec))
+        org-city-keys (filter #(substring? (first %) ".c") (keys org-spec))   ; track can merge into cities.
         new-rotated  (reduce #(assoc %1 (subs %2 1)
                                      (rotate-set new-orient (new-spec %2)))
                              {} new-city-keys)
         org-rotated  (reduce #(assoc %1 (subs %2 1)
-                                     (rotate-set orient (org-spec %2)))
+                                     (rotate-set orient
+                                                 (filter (fn [x] (not-any? (partial = x) org-merge-keys))
+                                                         (org-spec %2))))
                              {} org-city-keys)
         merge-keys (merge (select-keys new-spec new-merge-keys)
                           (reduce (fn [a [k v]]
