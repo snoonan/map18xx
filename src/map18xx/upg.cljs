@@ -70,14 +70,16 @@
         new-merge-keys (filter #(substring? (first %) "m") (keys to-map))
         org-merge-keys (first (vals (select-keys to-map new-merge-keys)))
         ]
-        (reduce
+    (if (empty? new-merge-keys)
+      (get-edges from-map)
+      (reduce
                    (fn
                      [a [k v]]
                      (update a "c" into
                                   (map #(filter
                                     (fn [x] (not-any? (partial = x) org-merge-keys))
                                     %) v)))
-                   {"c" []} (get-edges from-map))))
+                   {"c" []} (get-edges from-map)))))
 
 (defn upgrade-from?
   "Remove entries from to-map that are in from-map, nil if something is in from-map but not to-map Return remaining items"
