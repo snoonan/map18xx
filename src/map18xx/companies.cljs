@@ -3,8 +3,8 @@
             [om.dom :as dom]
             [cljsjs.react]
             [map18xx.map18io :as board]
-            [map18xx.utils :as utils]
-            ))
+            [map18xx.utils :as utils]))
+
 
 (def operating-state (atom {}))
 

@@ -4,8 +4,8 @@
             [cljsjs.react]
             [clojure.string :as string]
             [map18xx.upg :as upg]
-            [map18xx.utils :as utils]
-            ))
+            [map18xx.utils :as utils]))
+
 
 (def draw-state (atom {}))
 

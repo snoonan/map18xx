@@ -1,4 +1,4 @@
-(ns map18xx.upgrade )
+(ns map18xx.upgrade) 
 
 (def upgrade-simple {
                   [0 1] ["t7" 0]
